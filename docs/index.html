@@ -3,121 +3,178 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="KinRT: kinematics-guided routing for generalizable robot manipulation." />
+    <meta name="description" content="KinRT uses action-derived kinematic archetypes to supervise observation-only expert routing for generalizable robot manipulation." />
     <meta name="theme-color" content="#ffffff" />
-    <title>KinRT | Kinematics-Guided Routing</title>
-    <link rel="stylesheet" href="styles.css?v=20260818-2" />
-    <script src="app.js?v=20260818-2" defer></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="KinRT | Route by Kinematics, Act by Observation" />
+    <meta property="og:description" content="Kinematics-supervised expert routing in MoE-augmented vision-language-action models." />
+    <meta property="og:image" content="https://gleeacast.github.io/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA/assets/images/kinrt-method-overview.jpg" />
+    <meta property="og:url" content="https://gleeacast.github.io/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA/" />
+    <link rel="canonical" href="https://gleeacast.github.io/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA/" />
+    <title>KinRT | Route by Kinematics, Act by Observation</title>
+    <link rel="stylesheet" href="styles.css?v=20260818-4" />
+    <script src="app.js?v=20260818-3" defer></script>
   </head>
   <body data-page="home">
     <a class="skip-link" href="#main">Skip to content</a>
     <header class="site-header">
       <div class="header-inner">
-        <a class="brand" href="index.html"><span class="brand-mark">KR</span>KinRT</a>
+        <a class="brand" href="index.html" aria-label="KinRT project home"><span class="brand-mark">KR</span>KinRT</a>
         <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="primary-nav">Menu</button>
         <nav class="primary-nav" id="primary-nav" data-primary-nav aria-label="Primary navigation">
-          <a href="getting-started.html" data-page-link="start">Start</a>
-          <a href="method.html" data-page-link="method">Method</a>
+          <a href="#problem">Problem</a>
+          <a href="#method">Method</a>
+          <a href="#results">Results</a>
           <a href="robotwin.html" data-page-link="robotwin">RoboTwin</a>
           <a href="diyrobot.html" data-page-link="diyrobot">DIYRobot</a>
-          <a href="real-robot.html" data-page-link="hardware">Real robot</a>
-          <a href="reference.html" data-page-link="reference">Reference</a>
+          <a href="getting-started.html" data-page-link="start">Reproduce</a>
         </nav>
       </div>
     </header>
 
-    <main class="page home" id="main">
-      <section class="home-hero" aria-labelledby="page-title">
-        <p class="kicker">Open-source reproduction</p>
-        <h1 id="page-title">KinRT</h1>
-        <p class="home-subtitle">Kinematics-guided routing for generalizable robot manipulation.</p>
-        <p class="home-summary">Future action structure supervises a four-expert router during training. Deployment selects one expert from the current visual, language, and proprioceptive observation only.</p>
-        <div class="hero-actions">
-          <a class="button primary" href="getting-started.html">Start reproducing</a>
-          <a class="button secondary" href="method.html">Understand the method</a>
-        </div>
-        <div class="method-facts" aria-label="KinRT settings">
-          <span>4 experts</span><span>Top-1 routing</span><span>50-step actions</span><span>Observation-only inference</span>
+    <main id="main">
+      <section class="project-hero" aria-labelledby="page-title">
+        <img class="project-hero-image" src="assets/images/diyrobot-platform.png" alt="The open-source 14-DoF DIYRobot platform" fetchpriority="high" />
+        <div class="project-hero-inner">
+          <p class="project-eyebrow">Kinematics-supervised expert routing</p>
+          <h1 id="page-title">KinRT</h1>
+          <p class="project-title">Route by Kinematics, Act by Observation</p>
+          <p class="project-summary">Action trajectories teach a global router which motion expert to select. At deployment, the policy routes from the current visual-language observation only.</p>
+          <p class="project-authors">Tianhang Yang<sup>*</sup>, Yanze Zheng<sup>*</sup>, Junjie Wang, Wei-Bin Kou<sup>&dagger;</sup>, Ruotong Li, Yujiu Yang<sup>&dagger;</sup></p>
+          <p class="project-affiliation">Tsinghua University &middot; Pengcheng Lab &middot; <sup>*</sup>Equal contribution &middot; <sup>&dagger;</sup>Corresponding authors</p>
+          <div class="project-actions" aria-label="Project links">
+            <a class="button primary" href="https://arxiv.org/abs/2607.26807">Read the paper</a>
+            <a class="button secondary" href="https://github.com/gleeacast/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA">View the code</a>
+            <a class="text-action" href="getting-started.html">Reproduce KinRT <span aria-hidden="true">&rarr;</span></a>
+          </div>
         </div>
       </section>
 
-      <figure class="hero-figure">
-        <img src="assets/images/kinrt-pipeline.png" alt="KinRT pipeline from action-derived kinematic labels to observation-conditioned routing" />
-        <figcaption>Action-derived clusters supervise the route during training; future actions and router labels are absent at inference.</figcaption>
-      </figure>
+      <section class="project-band project-problem" id="problem" aria-labelledby="problem-title">
+        <div class="project-inner split-intro">
+          <div>
+            <p class="kicker">The routing problem</p>
+            <h2 id="problem-title">Visual similarity is not motion similarity.</h2>
+          </div>
+          <div class="problem-copy">
+            <p>Implicit MoE routers learn expert assignment from appearance and language alone. Robot manipulation breaks that assumption: similar scenes can demand different trajectories, while different objects can share the same kinematic structure.</p>
+            <p>KinRT uses privileged action information only during training. It clusters action and velocity into kinematic archetypes, supervises the router with those labels, and transfers that structure into observation-only routing at inference.</p>
+          </div>
+        </div>
+        <div class="project-inner method-rail" aria-label="Reported KinRT configuration">
+          <div><strong>4</strong><span>kinematic archetypes</span></div>
+          <div><strong>Top-1</strong><span>global routing</span></div>
+          <div><strong>50</strong><span>steps per action chunk</span></div>
+          <div><strong>0.05</strong><span>router loss coefficient</span></div>
+        </div>
+      </section>
 
-      <section class="home-section" aria-labelledby="method-title">
-        <div class="section-intro">
+      <section class="project-band project-method" id="method" aria-labelledby="method-title">
+        <div class="project-inner section-heading">
           <p class="kicker">Method</p>
-          <h2 id="method-title">Three stages, one routing decision</h2>
-          <p>KinRT adds explicit kinematic supervision without changing the information available to the deployed policy.</p>
+          <h2 id="method-title">Supervise with actions. Route with observations.</h2>
+          <p>KinRT discovers motion archetypes offline, uses their IDs to train a lightweight router, and activates one routed expert alongside a shared expert for every action chunk.</p>
         </div>
-        <div class="stage-grid">
-          <article><span>01</span><h3>Build labels</h3><p>Encode 50-step action chunks, standardize them, project to PCA-64, and cluster into four motion archetypes.</p></article>
-          <article><span>02</span><h3>Train the router</h3><p>Mean-pool valid observation-prefix tokens and optimize a dense router with frame-aligned cluster labels.</p></article>
-          <article><span>03</span><h3>Route at inference</h3><p>Select one residual expert for the action chunk using only the current observation and instruction.</p></article>
+        <figure class="project-method-figure">
+          <img src="assets/images/kinrt-method-overview.jpg" alt="KinRT clustering, global router, action-expert pipeline, and DIYRobot platform" loading="lazy" />
+          <figcaption>Action and velocity form the training-only supervisory signal. The deployed router receives observation embeddings and never requires future actions.</figcaption>
+        </figure>
+        <div class="project-inner method-steps">
+          <article><span>01</span><h3>Discover archetypes</h3><p>Encode 50-step trajectories, apply PCA, and cluster the action space into coherent motion regimes.</p></article>
+          <article><span>02</span><h3>Teach the router</h3><p>Use cluster IDs as explicit labels for a global router trained from pooled observation embeddings.</p></article>
+          <article><span>03</span><h3>Deploy without actions</h3><p>Select one specialized expert using the current images, instruction, and proprioceptive state.</p></article>
         </div>
       </section>
 
-      <section class="home-section" aria-labelledby="parameterization-title">
-        <div class="section-intro">
-          <p class="kicker">Single source tree</p>
-          <h2 id="parameterization-title">One KinRT implementation, two training choices</h2>
-          <p>FULL and LoRA share the same router, experts, labels, loss, and inference path. Select a configuration name; do not switch source directories.</p>
+      <section class="project-band project-results" id="results" aria-labelledby="results-title">
+        <div class="project-inner section-heading">
+          <p class="kicker">Key results</p>
+          <h2 id="results-title">Consistent gains across simulation and hardware.</h2>
+          <p>Reported values are average successful trials across eight RoboTwin tasks and five DIYRobot tasks.</p>
         </div>
-        <div class="table-wrap comparison-table"><table><thead><tr><th>Setting</th><th><code>kinrt_full</code></th><th><code>kinrt_lora</code></th></tr></thead><tbody>
-          <tr><td>Dense base</td><td>Trainable</td><td>Frozen</td></tr>
-          <tr><td>PaliGemma</td><td><code>gemma_2b</code></td><td><code>gemma_2b_lora</code>, rank 32</td></tr>
-          <tr><td>Action expert</td><td><code>gemma_300m</code></td><td><code>gemma_300m_lora</code>, rank 64</td></tr>
-          <tr><td>RoboTwin steps / batch</td><td>10,000 / 32</td><td>10,000 / 32</td></tr>
-          <tr><td>Checkpoint interval</td><td>500 steps</td><td>1,000 steps</td></tr>
-        </tbody></table></div>
-        <p class="section-link"><a href="method.html#variants">See the exact parameterization contract</a></p>
+        <div class="project-inner result-rail" aria-label="KinRT relative improvements">
+          <div><strong>+23.26%</strong><span>RoboTwin Easy</span></div>
+          <div><strong>+13.78%</strong><span>RoboTwin Hard</span></div>
+          <div><strong>+20.27%</strong><span>DIYRobot</span></div>
+        </div>
+        <div class="project-inner table-wrap result-table">
+          <table>
+            <thead><tr><th>Benchmark</th><th>Dense baseline</th><th>KinRT</th><th>Absolute gain</th><th>Relative gain</th></tr></thead>
+            <tbody>
+              <tr><td>RoboTwin 2.0 <small>Easy / Hard</small></td><td>33.1 / 34.1</td><td><strong>40.8 / 38.8</strong></td><td>+7.7 / +4.7</td><td><strong>+23.26% / +13.78%</strong></td></tr>
+              <tr><td>DIYRobot</td><td>29.6</td><td><strong>35.6</strong></td><td>+6.0</td><td><strong>+20.27%</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="project-inner result-note">KinRT also surpasses the strongest implicit-routing MoE baseline, AdaMoE, by +8.7/+9.4 successes on RoboTwin Easy/Hard and by +14.2 successes on DIYRobot.</p>
       </section>
 
-      <section class="home-section" aria-labelledby="benchmarks-title">
-        <div class="section-intro">
-          <p class="kicker">Reproduction tracks</p>
-          <h2 id="benchmarks-title">Simulation and real-world workflows</h2>
-          <p>The release connects one policy implementation to both evaluation tracks while keeping datasets, checkpoints, simulator assets, and robot control authority explicit.</p>
+      <section class="project-band project-benchmarks" aria-labelledby="benchmarks-title">
+        <div class="project-inner section-heading">
+          <p class="kicker">Evaluation</p>
+          <h2 id="benchmarks-title">Two platforms, three evaluation regimes.</h2>
+          <p>Simulation, standard real-world trials, and illumination-shift OOD trials test whether kinematic routing transfers across environments.</p>
         </div>
-        <div class="benchmark-grid">
-          <a href="robotwin.html" class="benchmark-link">
-            <img src="assets/images/posters/robotwin-05_place_dual_shoes_random.jpg" alt="RoboTwin randomized bimanual manipulation task" loading="lazy" />
-            <span>RoboTwin 2.0</span><strong>Eight tasks, clean and randomized</strong>
+        <div class="project-inner benchmark-gallery">
+          <a href="robotwin.html" class="benchmark-panel">
+            <img src="assets/images/posters/robotwin-05_place_dual_shoes_random.jpg" alt="RoboTwin randomized dual-shoe placement task" loading="lazy" />
+            <span>RoboTwin 2.0</span><strong>8 tasks &middot; Easy and Hard</strong><p>100 trials per task and condition.</p>
           </a>
-          <a href="diyrobot.html" class="benchmark-link">
-            <img src="assets/images/diyrobot-platform.png" alt="DIYRobot bimanual manipulation platform" loading="lazy" />
-            <span>DIYRobot</span><strong>Five training tasks and one OOD scene</strong>
+          <a href="diyrobot.html" class="benchmark-panel">
+            <img src="assets/images/diyrobot-platform.png" alt="The DIYRobot dual-arm platform" loading="lazy" />
+            <span>DIYRobot</span><strong>5 tasks &middot; 14-DoF</strong><p>50 standard trials per task.</p>
+          </a>
+          <a href="diyrobot.html" class="benchmark-panel">
+            <img src="assets/images/posters/diyrobot-06_ood_place_pill_box_old_scene.jpg" alt="DIYRobot task under altered illumination" loading="lazy" />
+            <span>OOD lighting</span><strong>100 additional trials</strong><p>Altered illumination, reported separately.</p>
           </a>
         </div>
       </section>
 
-      <section class="home-section quickstart" aria-labelledby="quick-title">
-        <div class="section-intro">
-          <p class="kicker">Quick start</p>
-          <h2 id="quick-title">Validate the release first</h2>
-          <p>The source, all 12 retained configs, comments, local links, assets, and SHA-256 manifest are checked before training.</p>
+      <section class="project-band project-reproduce" id="reproduce" aria-labelledby="reproduce-title">
+        <div class="project-inner split-intro">
+          <div>
+            <p class="kicker">Open-source reproduction</p>
+            <h2 id="reproduce-title">From source audit to robot deployment.</h2>
+          </div>
+          <div class="problem-copy">
+            <p>The release keeps KinRT FULL and LoRA in one source tree and separates simulator, dataset, checkpoint, and hardware prerequisites explicitly. Start with the software-only validation gate before training or connecting a robot.</p>
+          </div>
         </div>
-        <div class="code-block">
-          <div class="code-toolbar"><span>KinRT release</span><button class="copy-button" type="button" data-copy>Copy</button></div>
-          <pre><code>cd /path/to/KinRT
-python tools/validate_release.py --check-manifests
-
-cd policy/pi05
-uv sync --frozen
-uv run python scripts/compute_norm_stats.py --config-name kinrt_lora</code></pre>
-        </div>
-        <nav class="guide-links" aria-label="Reproduction guides">
-          <a href="getting-started.html"><strong>Installation</strong><span>Environment, artifacts, and first training gate</span></a>
-          <a href="robotwin.html"><strong>RoboTwin</strong><span>Simulation training and evaluation</span></a>
-          <a href="real-robot.html"><strong>HiArm</strong><span>Read-only audit and guarded deployment</span></a>
+        <nav class="project-inner reproduce-links" aria-label="KinRT reproduction guides">
+          <a href="getting-started.html"><span>01</span><strong>Getting started</strong><small>Environment and artifact checks</small></a>
+          <a href="method.html"><span>02</span><strong>Implementation</strong><small>Labels, router, loss, and variants</small></a>
+          <a href="robotwin.html"><span>03</span><strong>RoboTwin guide</strong><small>Simulation training and evaluation</small></a>
+          <a href="diyrobot.html"><span>04</span><strong>DIYRobot guide</strong><small>Data, training, and OOD protocol</small></a>
+          <a href="real-robot.html"><span>05</span><strong>Real-robot guide</strong><small>Preflight and guarded deployment</small></a>
+          <a href="reference.html"><span>06</span><strong>Reference</strong><small>Configs, artifacts, and troubleshooting</small></a>
         </nav>
+      </section>
+
+      <section class="project-band project-citation" aria-labelledby="citation-title">
+        <div class="project-inner citation-layout">
+          <div>
+            <p class="kicker">Citation</p>
+            <h2 id="citation-title">Cite KinRT</h2>
+            <p>Use the arXiv record while the archival publication metadata is pending.</p>
+          </div>
+          <div class="code-block">
+            <div class="code-toolbar"><span>BibTeX</span><button class="copy-button" type="button" data-copy>Copy</button></div>
+            <pre><code>@article{yang2026route,
+  title={Route by Kinematics, Act by Observation:
+    Kinematics-Supervised Expert Routing in MoE-Augmented VLA},
+  author={Yang, Tianhang and Zheng, Yanze and Wang, Junjie and
+    Kou, Wei-Bin and Li, Ruotong and Yang, Yujiu},
+  journal={arXiv preprint arXiv:2607.26807},
+  year={2026}
+}</code></pre>
+          </div>
+        </div>
       </section>
     </main>
 
     <footer class="site-footer">
-      <div class="footer-inner"><span>KinRT reproducibility documentation</span><nav class="footer-links" aria-label="Footer"><a href="../README.md">README</a><a href="reference.html#audit">Audit boundary</a><a href="reference.html#troubleshooting">Troubleshooting</a></nav></div>
+      <div class="footer-inner"><span>KinRT &middot; Tsinghua University &middot; Pengcheng Lab</span><nav class="footer-links" aria-label="Footer"><a href="https://arxiv.org/abs/2607.26807">Paper</a><a href="https://github.com/gleeacast/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA">Code</a><a href="getting-started.html">Reproduce</a></nav></div>
     </footer>
   </body>
 </html>

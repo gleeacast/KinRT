@@ -3,7 +3,7 @@
 <div align="center">
 
 [![Paper](https://img.shields.io/badge/Paper-arXiv%3A2607.26807-b31b1b?style=flat-square&logo=arxiv)](https://arxiv.org/abs/2607.26807)
-[![Project Page](https://img.shields.io/badge/Project-Page-green?style=flat-square&logo=github)](#)
+[![Project Page](https://img.shields.io/badge/Project-Page-green?style=flat-square&logo=github)](https://gleeacast.github.io/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA/)
 [![Models](https://img.shields.io/badge/Models-HuggingFace-orange?style=flat-square&logo=huggingface)](#)
 [![GitHub](https://img.shields.io/badge/Code-GitHub-black?style=flat-square&logo=github)](https://github.com/gleeacast/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA)
 [![License](https://img.shields.io/badge/License-Apache%202.0%20%7C%20MIT-lightgrey?style=flat-square)](LICENSES/)
@@ -191,11 +191,11 @@ The full RoboTwin simulator, datasets, base checkpoints, fine-tuned checkpoints,
 
 | Topic | Document |
 | --- | --- |
-| End-to-end starting point | [Getting started](docs/getting-started.html) |
+| End-to-end starting point | [Getting started](https://gleeacast.github.io/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA/getting-started.html) |
 | KinRT design and implementation | [Implementation reference](docs/KINRT_IMPLEMENTATION.md) |
-| RoboTwin training and evaluation | [RoboTwin guide](docs/robotwin.html) |
-| DIYRobot data and evaluation | [DIYRobot guide](docs/diyrobot.html) |
-| HiArm setup and safety gates | [Real-robot guide](docs/real-robot.html) |
+| RoboTwin training and evaluation | [RoboTwin guide](https://gleeacast.github.io/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA/robotwin.html) |
+| DIYRobot data and evaluation | [DIYRobot guide](https://gleeacast.github.io/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA/diyrobot.html) |
+| HiArm setup and safety gates | [Real-robot guide](https://gleeacast.github.io/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA/real-robot.html) |
 | FULL and LoRA differences | [Parameterization comparison](docs/FULL_VS_LORA.md) |
 | Source provenance and release changes | [Change and source manifest](CHANGELOG_AND_SOURCE_MANIFEST.md) |
 
