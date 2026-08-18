@@ -35,18 +35,19 @@ Mixture-of-Experts (MoE) policies can specialize different experts for different
 KinRT is designed for cases where motion structure, rather than visual or linguistic similarity, should determine expert specialization. It adds negligible inference cost, applies across multiple VLA backbones, and preserves observation-only deployment.
 
 <div align="center">
-<img src="docs/assets/images/kinrt-pipeline.png" width="960" alt="KinRT training and deployment pipeline"/>
+<img src="docs/assets/images/kinrt-method-overview.jpg" width="1000" alt="KinRT clustering, routing pipeline, and DIYRobot platform"/>
+<br>
+<sub><b>KinRT overview.</b> Action-derived kinematic archetypes supervise a global router that operates from observations at deployment.</sub>
 </div>
 
 ### Key Results
 
-The paper evaluates eight RoboTwin tasks under clean and randomized conditions and five tasks on the real-world DIYRobot platform. Values below are average successful trials across tasks.
+The paper evaluates eight RoboTwin tasks under Easy (Clean) and Hard (Randomized) conditions and five tasks on the real-world DIYRobot platform. Values below are average successful trials across tasks; RoboTwin scores are out of 100 trials per task and DIYRobot scores are out of 50.
 
-| Benchmark | Strongest dense baseline | KinRT | Absolute gain | Relative gain |
+| Benchmark | Baseline | KinRT | Absolute gain | Relative gain |
 | --- | ---: | ---: | ---: | ---: |
-| RoboTwin Clean, success out of 100 | PI0.5-LoRA: 33.1 | **KinRT-LoRA: 40.8** | +7.7 | **+23.26%** |
-| RoboTwin Random, success out of 100 | PI0.5-LoRA: 34.1 | **KinRT-LoRA: 38.8** | +4.7 | **+13.78%** |
-| DIYRobot, success out of 50 | PI0.5-Full: 29.6 | **KinRT-Full: 35.6** | +6.0 | **+20.27%** |
+| RoboTwin 2.0 (Easy / Hard) | 33.1 / 34.1 | **40.8 / 38.8** | +7.7 / +4.7 | **+23.26% / +13.78%** |
+| DIYRobot | 29.6 | **35.6** | +6.0 | **+20.27%** |
 
 KinRT also outperforms the strongest implicit-routing MoE baseline, AdaMoE, by +8.7/+9.4 successes on RoboTwin Clean/Random and by +14.2 successes on DIYRobot. The results expose a useful adaptation trade-off: LoRA performs best in simulation, while full fine-tuning is stronger on the real platform where the embodiment gap is larger.
 
@@ -172,9 +173,11 @@ Use a separate result directory for every model, checkpoint, task, and condition
 | Benchmark | Tasks | Training demonstrations | Evaluation protocol | Release support |
 | --- | ---: | ---: | --- | --- |
 | RoboTwin 2.0 | 8 | 800 total | 100 Clean + 100 Random trials per task | Policy and evaluation overlay |
-| DIYRobot | 5 | 500 total | 50 real-world trials per task | Configs, conversion, serving, and hardware guide |
+| DIYRobot | 5 | 500 total | 50 standard trials per task + 100 OOD trials | Configs, conversion, serving, and hardware guide |
 
 The full RoboTwin simulator, datasets, base checkpoints, fine-tuned checkpoints, and physical robot are external artifacts and are not bundled in this repository.
+
+> **OOD evaluation.** In addition to the standard DIYRobot protocol, we provide 100 evaluation trials under altered illumination. These lighting-shift trials represent OOD scenes and should be reported separately from the standard-lighting results.
 
 ### Sampling Configurations
 
@@ -183,23 +186,6 @@ The full RoboTwin simulator, datasets, base checkpoints, fine-tuned checkpoints,
 - RoboTwin reports Clean and Random conditions separately; each average is computed from eight per-task success counts.
 - DIYRobot uses five tasks and reports the average success count out of 50 trials.
 - Every result must record the source revision, dataset digest, router-label digest, normalization assets, checkpoint step, seeds, and evaluation condition.
-
-### Output Format
-
-Training writes checkpoints under the configured checkpoint base directory and experiment name. Evaluation roots are selected through `eval_result_root` and `router_info_root` in `deploy_policy.yml`. The remote evaluator writes the following records:
-
-```text
-<eval_result_root>/<run>/
-|-- _result.txt          # run header and per-episode CSV metrics
-`-- episode<N>.mp4       # optional evaluation video
-
-<router_info_root>/<episode>/
-|-- prompt.txt
-|-- metadata.json
-`-- infer_<step>.npz     # router tensors and the policy action chunk
-```
-
-Each `_result.txt` row records the episode, seed, success flag, cumulative success count, success rate, timing, action count, step limit, and router-telemetry directory. Preserve these outputs together with the model, checkpoint, task, condition, and source revision.
 
 ### Reproduction Documentation
 
