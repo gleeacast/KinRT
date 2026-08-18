@@ -1,0 +1,10 @@
+paper_model,model_family,adaptation,legacy_config,release_config,checkpoint_id,server_alias,global_batch_size,training_steps,gpu_count
+KinRT-Full,pi0.5,full + KinRT K4,pi05_hiarm_manual_500_promptv3_new_button_full_moe_k4,kinrt_full_diyrobot,hiarm_500_new_button_full_moe_k4_8000_bs32/8000,full_moe,32,8000,4
+pi0.5-Full,pi0.5,full dense,pi05_hiarm_manual_500_promptv3_new_button_full_base,pi05_full_diyrobot,hiarm_500_new_button_full_base_8000_bs32/8000,newbutton_full,32,8000,4
+KinRT-LoRA,pi0.5,LoRA + KinRT K4,pi05_hiarm_manual_500_promptv3_new_button_moe_k4,kinrt_lora_diyrobot,hiarm_500_new_button_lora_moe_k4_8000_bs32/8000,newbutton_loramoe,32,8000,4
+pi0.5-LoRA,pi0.5,LoRA dense,pi05_hiarm_manual_500_promptv3_new_button_lora,pi05_lora_diyrobot,hiarm_500_new_button_lora_8000_bs32/8000,newbutton_lora,32,8000,4
+pi0-Full,pi0,full dense,pi0_hiarm_manual_500_promptv3_new_button_full,pi0_full_diyrobot,hiarm_500_new_button_pi0_full_8000_bs32/8000,pi0,32,8000,4
+KinRT-Full (pi0),pi0,full + KinRT K4,pi0_hiarm_manual_500_promptv3_new_button_full_moe_k4,kinrt_full_pi0_diyrobot,hiarm_500_new_button_pi0_full_moe_k4_8000_bs32/8000,pi0_fullmoe,32,8000,4
+pi0-LoRA,pi0,LoRA dense,pi0_hiarm_manual_500_promptv3_new_button_lora,pi0_lora_diyrobot,hiarm_500_new_button_pi0_lora_8000_bs32/8000,pi0_lora,32,8000,4
+KinRT-LoRA (pi0),pi0,LoRA + KinRT K4,pi0_hiarm_manual_500_promptv3_new_button_moe_k4,kinrt_lora_pi0_diyrobot,hiarm_500_new_button_pi0_lora_moe_k4_8000_bs32/8000,pi0_loramoe,32,8000,4
+KinRT-AdaMoE,AdaMoE/pi0.5,full + AdaMoE + KinRT K4,pi05_hiarm_manual_500_promptv3_new_button_adamoe_kinrt_k4,kinrt_adamoe_diyrobot,hiarm_500_new_button_adamoe_kinrt_k4_8000_bs32/8000,adamoe_kinrt,32,8000,4

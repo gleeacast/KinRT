@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "paper_table": "Table 1",
+  "models": [
+    {
+      "paper_model": "OpenVLA",
+      "framework": "OpenVLA",
+      "training_status": "confirmed_external_run",
+      "release_config": null,
+      "legacy_config": null,
+      "source_entrypoint": "/private/openvla/openvla-oft/experiments/robot/robotwin/train_oft_robotwin_l20.sh",
+      "server_alias": "openvla_lora",
+      "checkpoint": "hiarm_new_button_openvla_lora_r32_bs16_8000/8000"
+    },
+    {
+      "paper_model": "RDT-1B",
+      "framework": "RDT-1B",
+      "training_status": "external_checkpoint_confirmed",
+      "release_config": null,
+      "legacy_config": null,
+      "source_entrypoint": "/private/RDT/finetune.sh",
+      "server_alias": "rdt",
+      "checkpoint": "rdt1b_hiarm_new_button_v3_bs32_8000/checkpoint-8000"
+    },
+    {
+      "paper_model": "pi0-Full",
+      "framework": "OpenPI",
+      "training_status": "confirmed_openpi_config",
+      "release_config": "pi0_full_diyrobot",
+      "legacy_config": "pi0_hiarm_manual_500_promptv3_new_button_full",
+      "source_entrypoint": "policy/pi05/scripts/train.py",
+      "server_alias": "pi0",
+      "checkpoint": "hiarm_500_new_button_pi0_full_8000_bs32/8000"
+    },
+    {
+      "paper_model": "pi0-LoRA",
+      "framework": "OpenPI",
+      "training_status": "confirmed_openpi_config",
+      "release_config": "pi0_lora_diyrobot",
+      "legacy_config": "pi0_hiarm_manual_500_promptv3_new_button_lora",
+      "source_entrypoint": "policy/pi05/scripts/train.py",
+      "server_alias": "pi0_lora",
+      "checkpoint": "hiarm_500_new_button_pi0_lora_8000_bs32/8000"
+    },
+    {
+      "paper_model": "pi0.5-Full",
+      "framework": "OpenPI",
+      "training_status": "confirmed_openpi_config",
+      "release_config": "pi05_full_diyrobot",
+      "legacy_config": "pi05_hiarm_manual_500_promptv3_new_button_full_base",
+      "source_entrypoint": "policy/pi05/scripts/train.py",
+      "server_alias": "newbutton_full",
+      "checkpoint": "hiarm_500_new_button_full_base_8000_bs32/8000"
+    },
+    {
+      "paper_model": "pi0.5-LoRA",
+      "framework": "OpenPI",
+      "training_status": "confirmed_openpi_config",
+      "release_config": "pi05_lora_diyrobot",
+      "legacy_config": "pi05_hiarm_manual_500_promptv3_new_button_lora",
+      "source_entrypoint": "policy/pi05/scripts/train.py",
+      "server_alias": "newbutton_lora",
+      "checkpoint": "hiarm_500_new_button_lora_8000_bs32/8000"
+    },
+    {
+      "paper_model": "Hi-MoE",
+      "framework": "Hi-MoE",
+      "training_status": "external_checkpoint_confirmed",
+      "release_config": null,
+      "legacy_config": "hiarm_new_button_finetune_chunk50",
+      "source_entrypoint": "/private/yth/projects/zyz26/HiMoE-VLA/scripts/train.py",
+      "server_alias": "himoe",
+      "checkpoint": "hiarm_new_button_official_pd8_ga4_4gpu_8000/checkpoint-8000"
+    },
+    {
+      "paper_model": "AdaMoE",
+      "framework": "AdaMoE",
+      "training_status": "external_checkpoint_confirmed",
+      "release_config": null,
+      "legacy_config": "AdaMoE_hiarm_5tasks_promptv2",
+      "source_entrypoint": "/private/yth/projects/zyz26/AdaMoE-VLA/scripts/train.py",
+      "server_alias": "newbutton_adamoe",
+      "checkpoint": "adamoe_hiarm_500_new_button_bs32_8000/8000"
+    },
+    {
+      "paper_model": "KinRT-OpenVLA",
+      "framework": "OpenVLA",
+      "training_status": "confirmed_external_run",
+      "release_config": null,
+      "legacy_config": null,
+      "source_entrypoint": "/private/openvla/openvla-oft/experiments/robot/robotwin/train_oft_robotwin_l20.sh",
+      "server_alias": "openvla_kinrt",
+      "checkpoint": "hiarm_new_button_openvla_kinrt_k4_lora_r32_bs16_8000/8000"
+    },
+    {
+      "paper_model": "KinRT-Full (pi0)",
+      "framework": "OpenPI",
+      "training_status": "confirmed_openpi_config",
+      "release_config": "kinrt_full_pi0_diyrobot",
+      "legacy_config": "pi0_hiarm_manual_500_promptv3_new_button_full_moe_k4",
+      "source_entrypoint": "policy/pi05/scripts/train.py",
+      "server_alias": "pi0_fullmoe",
+      "checkpoint": "hiarm_500_new_button_pi0_full_moe_k4_8000_bs32/8000"
+    },
+    {
+      "paper_model": "KinRT-LoRA (pi0)",
+      "framework": "OpenPI",
+      "training_status": "confirmed_openpi_config",
+      "release_config": "kinrt_lora_pi0_diyrobot",
+      "legacy_config": "pi0_hiarm_manual_500_promptv3_new_button_moe_k4",
+      "source_entrypoint": "policy/pi05/scripts/train.py",
+      "server_alias": "pi0_loramoe",
+      "checkpoint": "hiarm_500_new_button_pi0_lora_moe_k4_8000_bs32/8000"
+    },
+    {
+      "paper_model": "KinRT-AdaMoE",
+      "framework": "OpenPI",
+      "training_status": "confirmed_openpi_config",
+      "release_config": "kinrt_adamoe_diyrobot",
+      "legacy_config": "pi05_hiarm_manual_500_promptv3_new_button_adamoe_kinrt_k4",
+      "source_entrypoint": "policy/pi05/scripts/train.py",
+      "server_alias": "adamoe_kinrt",
+      "checkpoint": "hiarm_500_new_button_adamoe_kinrt_k4_8000_bs32/8000"
+    },
+    {
+      "paper_model": "KinRT-Full",
+      "framework": "OpenPI",
+      "training_status": "confirmed_openpi_config",
+      "release_config": "kinrt_full_diyrobot",
+      "legacy_config": "pi05_hiarm_manual_500_promptv3_new_button_full_moe_k4",
+      "source_entrypoint": "policy/pi05/scripts/train.py",
+      "server_alias": "full_moe",
+      "checkpoint": "hiarm_500_new_button_full_moe_k4_8000_bs32/8000"
+    },
+    {
+      "paper_model": "KinRT-LoRA",
+      "framework": "OpenPI",
+      "training_status": "confirmed_openpi_config",
+      "release_config": "kinrt_lora_diyrobot",
+      "legacy_config": "pi05_hiarm_manual_500_promptv3_new_button_moe_k4",
+      "source_entrypoint": "policy/pi05/scripts/train.py",
+      "server_alias": "newbutton_loramoe",
+      "checkpoint": "hiarm_500_new_button_lora_moe_k4_8000_bs32/8000"
+    }
+  ]
+}

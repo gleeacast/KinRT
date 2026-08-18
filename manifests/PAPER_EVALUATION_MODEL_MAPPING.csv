@@ -1,0 +1,15 @@
+paper_model,source_workbook,framework,adaptation,server_alias,checkpoint_id,trial_count_per_task
+OpenVLA,openvla.xlsx,OpenVLA,LoRA,openvla_lora,hiarm_new_button_openvla_lora_r32_bs16_8000/8000,50
+RDT-1B,rdt.xlsx,RDT-1B,full fine-tuning,rdt,rdt1b_hiarm_new_button_v3_bs32_8000/checkpoint-8000,50
+pi0-Full,pi0full.xlsx,pi0,full fine-tuning,pi0,hiarm_500_new_button_pi0_full_8000_bs32/8000,50
+pi0-LoRA,pi0lora.xlsx,pi0,LoRA,pi0_lora,hiarm_500_new_button_pi0_lora_8000_bs32/8000,50
+pi0.5-Full,full.xlsx,pi0.5,full fine-tuning,newbutton_full,hiarm_500_new_button_full_base_8000_bs32/8000,50
+pi0.5-LoRA,lora.xlsx,pi0.5,LoRA,newbutton_lora,hiarm_500_new_button_lora_8000_bs32/8000,50
+Hi-MoE,himoe.xlsx,Hi-MoE,official fine-tuning,himoe,hiarm_new_button_official_pd8_ga4_4gpu_8000/checkpoint-8000,50
+AdaMoE,adanoe.xlsx,AdaMoE,official MoE fine-tuning,newbutton_adamoe,adamoe_hiarm_500_new_button_bs32_8000/8000,50
+KinRT-OpenVLA,openvlakinrt.xlsx,OpenVLA,LoRA + KinRT K4,openvla_kinrt,hiarm_new_button_openvla_kinrt_k4_lora_r32_bs16_8000/8000,50
+KinRT-Full (pi0),pi0 fullmoe.xlsx,pi0,full + KinRT K4,pi0_fullmoe,hiarm_500_new_button_pi0_full_moe_k4_8000_bs32/8000,50
+KinRT-LoRA (pi0),pi0loramoe.xlsx,pi0,LoRA + KinRT K4,pi0_loramoe,hiarm_500_new_button_pi0_lora_moe_k4_8000_bs32/8000,50
+KinRT-AdaMoE,adamoekinrt.xlsx,AdaMoE/pi0.5,full + AdaMoE + KinRT K4,adamoe_kinrt,hiarm_500_new_button_adamoe_kinrt_k4_8000_bs32/8000,50
+KinRT-Full,full-moe.xlsx,pi0.5,full + KinRT K4,full_moe,hiarm_500_new_button_full_moe_k4_8000_bs32/8000,50
+KinRT-LoRA,lora-moe.xlsx,pi0.5,LoRA + KinRT K4,newbutton_loramoe,hiarm_500_new_button_lora_moe_k4_8000_bs32/8000,50

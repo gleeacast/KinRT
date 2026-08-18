@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="End-to-end KinRT reproduction workflow for RoboTwin 2.0 training and evaluation." />
+    <title>RoboTwin Reproduction | KinRT</title>
+    <link rel="stylesheet" href="styles.css?v=20260818-2" />
+    <script src="app.js?v=20260818-2" defer></script>
+  </head>
+  <body data-page="robotwin">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header"><div class="header-inner"><a class="brand" href="index.html"><span class="brand-mark">KR</span>KinRT</a><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="primary-nav">Menu</button><nav class="primary-nav" id="primary-nav" data-primary-nav aria-label="Primary navigation"><a href="getting-started.html" data-page-link="start">Start</a><a href="method.html" data-page-link="method">Method</a><a href="robotwin.html" data-page-link="robotwin">RoboTwin</a><a href="diyrobot.html" data-page-link="diyrobot">DIYRobot</a><a href="real-robot.html" data-page-link="hardware">Real robot</a><a href="reference.html" data-page-link="reference">Reference</a></nav></div></header>
+    <div class="release-strip"><div class="release-strip-inner"><span><span class="status-dot"></span><strong>Trials</strong> 8 tasks x 2 conditions x 100</span><span><strong>Primary configs</strong> kinrt_full / kinrt_lora</span><span><span class="status-dot external"></span><strong>Simulator checkout</strong> external</span></div></div>
+    <div class="page docs-shell">
+      <aside class="sidebar" aria-label="Documentation navigation">
+        <p class="sidebar-label">Reproduce</p><nav><a href="getting-started.html" data-page-link="start">Getting started</a><a href="method.html" data-page-link="method">Method</a><a href="robotwin.html" data-page-link="robotwin">RoboTwin</a><a href="diyrobot.html" data-page-link="diyrobot">DIYRobot</a><a href="real-robot.html" data-page-link="hardware">Real robot</a><a href="reference.html" data-page-link="reference">Reference</a></nav>
+        <div class="sidebar-divider"></div><p class="sidebar-label">On this page</p><nav><a href="#scope">Scope</a><a href="#simulator">Simulator</a><a href="#data">Dataset</a><a href="#labels">Labels</a><a href="#train">Training</a><a href="#evaluation">Evaluation</a><a href="#tasks">Task matrix</a><a href="#reporting">Reporting</a></nav>
+      </aside>
+      <main class="doc-main" id="main">
+        <header class="doc-header">
+          <p class="kicker">Simulation benchmark</p><h1>Reproduce RoboTwin</h1>
+          <p class="doc-lead">Train KinRT on the 800-episode RoboTwin set, serve a concrete checkpoint, and evaluate all eight tasks under clean and randomized conditions without mixing sessions or output directories.</p>
+          <div class="doc-meta"><span>Training: 10,000 steps</span><span>Global batch: 32</span><span>Evaluation: 100 trials per condition</span></div>
+        </header>
+
+        <section class="section" id="scope">
+          <div class="section-head"><span class="section-index">01</span><div><h2>Set the reproduction boundary</h2></div></div>
+          <p><code>policy/</code> contains the single KinRT implementation, and <code>script/</code> contains the RoboTwin evaluation overlay. The release does not contain the complete simulator, task assets, or the 800-episode training dataset.</p>
+          <div class="callout warning"><strong>Use an isolated simulator worktree.</strong><p>Apply the unified overlay once, select either <code>kinrt_full</code> or <code>kinrt_lora</code>, and record that config with every checkpoint and evaluation.</p></div>
+          <div class="table-wrap"><table><thead><tr><th>Run</th><th>Source</th><th>Config</th><th>Initialization</th></tr></thead><tbody>
+            <tr><td>KinRT FULL</td><td><code>policy/pi05</code></td><td><code>kinrt_full</code></td><td>PI0.5 dense base</td></tr>
+            <tr><td>KinRT LoRA</td><td><code>policy/pi05</code></td><td><code>kinrt_lora</code></td><td>PI0.5 base plus LoRA</td></tr>
+          </tbody></table></div>
+        </section>
+
+        <section class="section" id="simulator">
+          <div class="section-head"><span class="section-index">02</span><div><h2>Prepare a compatible RoboTwin checkout</h2></div></div>
+          <p>Install RoboTwin 2.0 and its simulator assets according to the upstream project. Before applying the policy overlay, verify that the checkout contains <code>envs/</code>, <code>task_config/</code>, <code>script/</code>, and the embodiment assets required by the selected tasks.</p>
+          <div class="code-block"><div class="code-toolbar"><span>Apply the KinRT overlay</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>export ROBOTWIN_ROOT=/work/RoboTwin-kinrt
+test -d "$ROBOTWIN_ROOT/envs"
+test -d "$ROBOTWIN_ROOT/task_config"
+cp -a /path/to/KinRT/policy/. "$ROBOTWIN_ROOT/policy/"
+cp -a /path/to/KinRT/script/. "$ROBOTWIN_ROOT/script/"
+cd "$ROBOTWIN_ROOT/policy/pi05"
+uv sync --frozen</code></pre></div>
+          <p>FULL and LoRA use this same overlay. Use separate experiment names and output directories, and preserve the upstream RoboTwin commit and simulator asset version in the experiment record.</p>
+          <div class="callout"><strong>Gate</strong><p>Import the task module, load one task config, and reset one episode without loading a policy. Simulator failures must be resolved before policy debugging.</p></div>
+        </section>
+
+        <section class="section" id="data">
+          <div class="section-head"><span class="section-index">03</span><div><h2>Verify the 800-episode dataset</h2></div></div>
+          <p>The reported comparison uses 162,545 frames from 800 episodes. The active config expects three images, state, action, and prompt fields after repacking.</p>
+          <div class="table-wrap"><table><thead><tr><th>Model input</th><th>LeRobot field in the reported config</th></tr></thead><tbody>
+            <tr><td><code>images.cam_high</code></td><td><code>observation.images.cam_high</code></td></tr>
+            <tr><td><code>images.cam_left_wrist</code></td><td><code>observation.images.cam_left_wrist</code></td></tr>
+            <tr><td><code>images.cam_right_wrist</code></td><td><code>observation.images.cam_right_wrist</code></td></tr>
+            <tr><td><code>state</code></td><td><code>observation.state</code></td></tr>
+            <tr><td><code>actions</code></td><td><code>action</code></td></tr>
+            <tr><td><code>prompt</code></td><td>Task text via <code>prompt_from_task=True</code></td></tr>
+          </tbody></table></div>
+          <p>Replace the placeholder <code>repo_id="demo_mixed_repo"</code> with the local LeRobot dataset identity. Verify episode count, frame count, field shapes, action units, and global index coverage.</p>
+        </section>
+
+        <section class="section" id="labels">
+          <div class="section-head"><span class="section-index">04</span><div><h2>Generate and verify K=4 labels</h2></div></div>
+          <div class="code-block"><div class="code-toolbar"><span>RoboTwin router labels</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>cd "$ROBOTWIN_ROOT/policy/pi05"
+uv run python scripts/generate_router_labels.py \
+  --repo-root /data/lerobot/robotwin_800 \
+  --output-dir /data/lerobot/robotwin_800/meta/router_labels_k4 \
+  --episodes 0:800 \
+  --action-horizon 50 \
+  --feature-mode chunk_velocity \
+  --pca-components 64 \
+  --num-clusters 4 \
+  --seed 0</code></pre></div>
+          <p>For an exact comparison against the audited run, the label array digest is <code>bceda7104ee949d37c9872a50c06842a111387ad5b63eb9011d50e19b33b256a</code>. A newly reconstructed dataset may produce a different digest; report it instead of claiming byte identity.</p>
+          <div class="callout success"><strong>Expected gate</strong><p>The selected 162,545 sample indices all map to non-negative labels and the summary reports four non-empty clusters.</p></div>
+        </section>
+
+        <section class="section" id="train">
+          <div class="section-head"><span class="section-index">05</span><div><h2>Compute norm stats and train</h2></div></div>
+          <p>Point the selected config to the local dataset, labels, base weights, and writable output. Keep one config name from normalization through serving.</p>
+          <div class="code-block"><div class="code-toolbar"><span>FULL training</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>cd "$ROBOTWIN_ROOT/policy/pi05"
+uv run python scripts/compute_norm_stats.py --config-name kinrt_full
+uv run python scripts/train.py kinrt_full --exp-name robotwin_kinrt_full</code></pre></div>
+          <div class="code-block"><div class="code-toolbar"><span>LoRA training</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>cd /work/RoboTwin-kinrt-lora/policy/pi05
+uv run python scripts/compute_norm_stats.py --config-name kinrt_lora
+uv run python scripts/train.py kinrt_lora --exp-name robotwin_kinrt_lora</code></pre></div>
+          <p>The audited settings are 10,000 steps, global batch 32, EMA disabled, supervised router coefficient 0.05, and inverse-square-root balanced sampling. FULL uses one FSDP device in the retained config; LoRA uses two. Report any resource override.</p>
+        </section>
+
+        <section class="section" id="evaluation">
+          <div class="section-head"><span class="section-index">06</span><div><h2>Evaluate one immutable checkpoint</h2></div></div>
+          <p>Create <code>deploy_policy.yml</code> from the included example. Resolve every placeholder before starting the server.</p>
+          <div class="code-block"><div class="code-toolbar"><span>Required deployment fields</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>policy_name: pi05
+task_name: &lt;task-module-name&gt;
+task_config: &lt;clean-or-random-config&gt;
+test_num: 100
+train_config_name: kinrt_full
+model_name: robotwin_kinrt_full
+checkpoint_id: 10000
+checkpoint_dir: /checkpoints
+model_server_host: &lt;reachable-server-host&gt;
+server_bind_host: 0.0.0.0
+port: 8001
+eval_result_root: ./eval_result
+router_info_root: ./eval_result/router_info
+record_router_info: true</code></pre></div>
+          <h3>Local evaluation</h3>
+          <div class="code-block"><div class="code-toolbar"><span>One task and condition</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>cd "$ROBOTWIN_ROOT/policy/pi05"
+bash eval.sh &lt;task_name&gt; &lt;task_config&gt; kinrt_full \
+  robotwin_kinrt_full 0 0</code></pre></div>
+          <h3>Remote evaluation</h3>
+          <div class="code-block"><div class="code-toolbar"><span>Model server</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>cd "$ROBOTWIN_ROOT/policy/pi05"
+bash serve_remote_model.sh deploy_policy.yml</code></pre></div>
+          <div class="code-block"><div class="code-toolbar"><span>Simulator client</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>cd "$ROBOTWIN_ROOT/policy/pi05"
+MODEL_SERVER_HOST=&lt;reachable-server-host&gt; \
+  bash eval_remote.sh &lt;task_name&gt; 0</code></pre></div>
+          <p>The server creates an independent policy session for each socket connection. LORA additionally uses an explicit <code>eval_done</code> acknowledgment, a 300-second client socket timeout, episode-level exception isolation, and checkpoint identifiers in responses. These are robustness differences, not changes to KinRT.</p>
+        </section>
+
+        <section class="section" id="tasks">
+          <div class="section-head"><span class="section-index">07</span><div><h2>Complete the 16-condition task matrix</h2></div></div>
+          <p>Resolve the exact task module and task-config filenames from the compatible RoboTwin checkout. The paper reports these eight task labels under both clean and randomized conditions.</p>
+          <div class="poster-grid">
+            <div class="poster-item"><img src="assets/images/posters/robotwin-01_hand_block_clean.jpg" alt="RoboTwin hand block task" /><span>Hand block</span></div>
+            <div class="poster-item"><img src="assets/images/posters/robotwin-02_hang_mug_clean.jpg" alt="RoboTwin hang mug task" /><span>Hang mug</span></div>
+            <div class="poster-item"><img src="assets/images/posters/robotwin-03_move_can_to_pot_clean.jpg" alt="RoboTwin move can task" /><span>Move can</span></div>
+            <div class="poster-item"><img src="assets/images/posters/robotwin-04_open_laptop_clean.jpg" alt="RoboTwin open laptop task" /><span>Open laptop</span></div>
+            <div class="poster-item"><img src="assets/images/posters/robotwin-05_place_dual_shoes_clean.jpg" alt="RoboTwin place shoes task" /><span>Place shoes</span></div>
+            <div class="poster-item"><img src="assets/images/posters/robotwin-06_place_mouse_on_pad_clean.jpg" alt="RoboTwin place object on pad task" /><span>Place on pad</span></div>
+            <div class="poster-item"><img src="assets/images/posters/robotwin-07_rotate_qrcode_clean.jpg" alt="RoboTwin rotate QR code task" /><span>Rotate QR code</span></div>
+            <div class="poster-item"><img src="assets/images/posters/robotwin-08_turn_switch_clean.jpg" alt="RoboTwin turn switch task" /><span>Turn switch</span></div>
+          </div>
+          <div class="checklist">
+            <div class="check-item"><strong>Clean condition</strong><p>100 requested trials per task with a fixed checkpoint and recorded seeds.</p></div>
+            <div class="check-item"><strong>Random condition</strong><p>100 requested trials per task using the corresponding randomization config.</p></div>
+            <div class="check-item"><strong>Failure accounting</strong><p>Transport failure is terminal; valid simulation or inference failures count as failed episodes.</p></div>
+            <div class="check-item"><strong>Completion</strong><p>Count results on disk and do not trust a partial client exit as a completed evaluation.</p></div>
+          </div>
+        </section>
+
+        <section class="section" id="reporting">
+          <div class="section-head"><span class="section-index">08</span><div><h2>Report enough information to audit the result</h2></div></div>
+          <ul>
+            <li>FULL or LoRA config name, source commit, and all config overrides.</li>
+            <li>Dataset identity, frame count, label digest, norm-stat asset ID, and base checkpoint.</li>
+            <li>Fine-tuned experiment name, checkpoint step, and parameterization.</li>
+            <li>RoboTwin commit, task module, task config, simulator assets, condition, and seed set.</li>
+            <li>Requested, completed, successful, failed, and transport-aborted episode counts.</li>
+            <li>Evaluation result directory and router telemetry directory.</li>
+          </ul>
+          <div class="callout danger"><strong>Never combine partial runs silently.</strong><p>If an evaluation is resumed, preserve the original seed/result records and document the merge rule.</p></div>
+        </section>
+        <nav class="next-prev" aria-label="Adjacent pages"><a href="method.html"><span>Previous</span><strong>Method</strong></a><a href="diyrobot.html"><span>Next</span><strong>DIYRobot reproduction</strong></a></nav>
+      </main>
+    </div>
+    <footer class="site-footer"><div class="footer-inner"><span>KinRT reproducibility documentation</span><nav class="footer-links" aria-label="Footer"><a href="../README.md">README</a><a href="FULL_VS_LORA.md">Variant comparison</a><a href="reference.html#troubleshooting">Troubleshooting</a></nav></div></footer>
+  </body>
+</html>

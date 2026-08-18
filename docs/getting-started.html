@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Beginner setup guide for KinRT source, datasets, router labels, normalization, and training." />
+    <title>Getting Started | KinRT</title>
+    <link rel="stylesheet" href="styles.css?v=20260818-2" />
+    <script src="app.js?v=20260818-2" defer></script>
+  </head>
+  <body data-page="start">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header"><div class="header-inner"><a class="brand" href="index.html"><span class="brand-mark">KR</span>KinRT</a><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="primary-nav">Menu</button><nav class="primary-nav" id="primary-nav" data-primary-nav aria-label="Primary navigation"><a href="getting-started.html" data-page-link="start">Start</a><a href="method.html" data-page-link="method">Method</a><a href="robotwin.html" data-page-link="robotwin">RoboTwin</a><a href="diyrobot.html" data-page-link="diyrobot">DIYRobot</a><a href="real-robot.html" data-page-link="hardware">Real robot</a><a href="reference.html" data-page-link="reference">Reference</a></nav></div></header>
+    <div class="release-strip"><div class="release-strip-inner"><span><span class="status-dot"></span><strong>Start gate</strong> source validation</span><span><strong>Then</strong> environment and artifacts</span><span><strong>Finish</strong> one-step training smoke test</span></div></div>
+
+    <div class="page docs-shell">
+      <aside class="sidebar" aria-label="Documentation navigation">
+        <p class="sidebar-label">Reproduce</p><nav><a href="getting-started.html" data-page-link="start">Getting started</a><a href="method.html" data-page-link="method">Method</a><a href="robotwin.html" data-page-link="robotwin">RoboTwin</a><a href="diyrobot.html" data-page-link="diyrobot">DIYRobot</a><a href="real-robot.html" data-page-link="hardware">Real robot</a><a href="reference.html" data-page-link="reference">Reference</a></nav>
+        <div class="sidebar-divider"></div><p class="sidebar-label">On this page</p><nav><a href="#prerequisites">Prerequisites</a><a href="#layout">Package layout</a><a href="#variant">Choose a training mode</a><a href="#install">Install</a><a href="#artifacts">Connect artifacts</a><a href="#dataset">Dataset gate</a><a href="#smoke">Training smoke test</a></nav>
+      </aside>
+
+      <main class="doc-main" id="main">
+        <header class="doc-header">
+          <p class="kicker">Common setup</p><h1>Getting started</h1>
+          <p class="doc-lead">Prepare a clean KinRT environment and verify every external input before launching a long training run. This page stops at a one-step software smoke test; benchmark-specific commands follow on the RoboTwin and DIYRobot pages.</p>
+          <div class="doc-meta"><span>Audience: first-time user</span><span>Platform: Linux GPU host</span><span>Runtime: Python 3.11+, CUDA 12, uv</span></div>
+        </header>
+
+        <section class="section" id="prerequisites">
+          <div class="section-head"><span class="section-index">01</span><div><h2>Check the prerequisites</h2></div></div>
+          <div class="checklist">
+            <div class="check-item"><strong>Operating system</strong><p>Ubuntu 22.04 or a compatible Linux distribution. Windows is suitable for reading the site, not for the recorded JAX/CUDA workflow.</p></div>
+            <div class="check-item"><strong>GPU stack</strong><p>NVIDIA driver with CUDA 12 support. The FULL variant requires substantially more trainable memory than LoRA.</p></div>
+            <div class="check-item"><strong>Tools</strong><p>Git, Git LFS, FFmpeg, Python 3.11 or newer, and uv.</p></div>
+            <div class="check-item"><strong>Storage</strong><p>Space for the dataset, base parameters, normalization assets, labels, checkpoints, and evaluation videos.</p></div>
+          </div>
+          <div class="code-block"><div class="code-toolbar"><span>Host checks</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>python3 --version
+nvidia-smi
+git lfs version
+ffmpeg -version
+uv --version</code></pre></div>
+          <div class="callout"><strong>Expected gate</strong><p>Python is at least 3.11, the GPU is visible, and all four command-line tools return without error.</p></div>
+        </section>
+
+        <section class="section" id="layout">
+          <div class="section-head"><span class="section-index">02</span><div><h2>Understand what is included</h2></div></div>
+          <p>The release contains one KinRT/OpenPI policy workspace. FULL and LoRA are configuration choices in the same registry; the RoboTwin environment and all large artifacts remain external.</p>
+          <div class="table-wrap"><table><thead><tr><th>Path</th><th>Purpose</th><th>Use directly?</th></tr></thead><tbody>
+            <tr><td><code>policy/pi05</code></td><td>KinRT training, serving, and all retained OpenPI configs</td><td>Yes</td></tr>
+            <tr><td><code>script</code></td><td>RoboTwin evaluation overlay</td><td>Copy into a compatible simulator checkout</td></tr>
+            <tr><td><code>configs/PAPER_MODELS.json</code></td><td>Paper model evidence and checkpoint mapping</td><td>Reference</td></tr>
+            <tr><td><code>manifests/</code></td><td>Unified source inventory and provenance</td><td>Validation</td></tr>
+          </tbody></table></div>
+          <div class="callout warning"><strong>Not a data release</strong><p>No private dataset, router-label array, base weight, trained checkpoint, simulator asset, or calibration file is embedded in this package.</p></div>
+        </section>
+
+        <section class="section" id="variant">
+          <div class="section-head"><span class="section-index">03</span><div><h2>Choose FULL or LoRA</h2></div></div>
+          <p>Both variants implement KinRT. Choose by optimization budget, not by routing behavior.</p>
+          <div class="table-wrap"><table><thead><tr><th>Property</th><th>FULL</th><th>LoRA</th></tr></thead><tbody>
+            <tr><td>RoboTwin config</td><td><code>kinrt_full</code></td><td><code>kinrt_lora</code></td></tr>
+            <tr><td>PaliGemma</td><td>Dense <code>gemma_2b</code></td><td><code>gemma_2b_lora</code>, rank 32</td></tr>
+            <tr><td>Action expert</td><td>Dense <code>gemma_300m</code></td><td><code>gemma_300m_lora</code>, rank 64</td></tr>
+            <tr><td>Base parameters</td><td>Trainable</td><td>Frozen by filter</td></tr>
+            <tr><td>Router and routed experts</td><td>Trainable</td><td>Trainable</td></tr>
+            <tr><td>Routing objective</td><td>Identical KinRT setting</td><td>Identical KinRT setting</td></tr>
+          </tbody></table></div>
+          <p>For a first installation test, use <code>kinrt_lora</code>. For the paper's FULL row, use <code>kinrt_full</code> from the same config registry.</p>
+        </section>
+
+        <section class="section" id="install">
+          <div class="section-head"><span class="section-index">04</span><div><h2>Install the pinned environment</h2></div></div>
+          <div class="code-block"><div class="code-toolbar"><span>KinRT workspace</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>cd /path/to/KinRT/policy/pi05
+uv sync --frozen
+uv run python -c "import jax; print(jax.devices())"
+uv run python -c "from openpi.training import config; print(config.get_config('kinrt_lora').name)"</code></pre></div>
+          <p>The lockfile pins JAX 0.5.0, Flax 0.10.2, Transformers 4.48.1, and a recorded LeRobot revision. Do not update dependencies during a reproduction run unless the changed environment is reported separately.</p>
+          <div class="callout success"><strong>Expected gate</strong><p>JAX lists a GPU and the final command prints <code>kinrt_lora</code>.</p></div>
+        </section>
+
+        <section class="section" id="artifacts">
+          <div class="section-head"><span class="section-index">05</span><div><h2>Connect external artifacts</h2></div></div>
+          <p>Edit only the selected block in <code>src/openpi/training/config.py</code>. Replace its dataset identity, router-label path, base checkpoint path, asset location, and checkpoint output location.</p>
+          <div class="table-wrap"><table><thead><tr><th>Config field</th><th>Must point to</th><th>Failure symptom</th></tr></thead><tbody>
+            <tr><td><code>repo_id</code></td><td>The intended LeRobot dataset</td><td>Missing dataset or wrong task count</td></tr>
+            <tr><td><code>router_labels_path</code></td><td>Labels generated from that exact dataset revision</td><td>Index error or semantically wrong supervision</td></tr>
+            <tr><td><code>weight_loader</code></td><td>Matching PI0.5 or PI0 base <code>params</code></td><td>Shape or restore error</td></tr>
+            <tr><td><code>assets_dir</code> / <code>asset_id</code></td><td>Norm stats for this dataset and action schema</td><td>Missing stats or unstable actions</td></tr>
+            <tr><td><code>checkpoint_base_dir</code></td><td>A writable local filesystem</td><td>Checkpoint save failure</td></tr>
+          </tbody></table></div>
+          <div class="callout danger"><strong>Path existence is not identity.</strong><p>A file at the expected path may still belong to another dataset or model. Record checksums and metadata with every experiment.</p></div>
+        </section>
+
+        <section class="section" id="dataset">
+          <div class="section-head"><span class="section-index">06</span><div><h2>Pass the dataset gate</h2></div></div>
+          <p>Inspect metadata before running PCA/KMeans or normalization. KinRT aligns labels by the LeRobot global <code>index</code> field.</p>
+          <div class="code-block"><div class="code-toolbar"><span>Dataset metadata check</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>python - &lt;&lt;'PY'
+import json
+from pathlib import Path
+
+root = Path("/data/lerobot/my_dataset")
+info = json.loads((root / "meta" / "info.json").read_text())
+required = {"observation.state", "action"}
+features = set(info["features"])
+print("episodes", info["total_episodes"])
+print("frames", info["total_frames"])
+print("missing", sorted(required - features))
+print("data_path", info["data_path"])
+PY</code></pre></div>
+          <p>For DIYRobot, verify 14-D state/action vectors in degrees and three image streams. For RoboTwin, verify that the selected conversion produces the exact keys used by the config.</p>
+        </section>
+
+        <section class="section" id="smoke">
+          <div class="section-head"><span class="section-index">07</span><div><h2>Run a bounded training smoke test</h2></div></div>
+          <p>Generate router labels first, then compute norm stats. Before a full run, override the selected config in a disposable copy to one step and one checkpoint. Do not publish smoke settings as benchmark settings.</p>
+          <div class="code-block"><div class="code-toolbar"><span>Core pipeline</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>uv run python scripts/generate_router_labels.py \
+  --repo-root /data/lerobot/my_dataset \
+  --output-dir /data/lerobot/my_dataset/meta/router_labels_k4 \
+  --action-horizon 50 --feature-mode chunk_velocity \
+  --pca-components 64 --num-clusters 4 --seed 0
+
+uv run python scripts/compute_norm_stats.py --config-name kinrt_lora
+uv run python scripts/train.py kinrt_lora --exp-name kinrt_smoke</code></pre></div>
+          <div class="callout success"><strong>Expected gate</strong><p>Data loading succeeds, total loss and router loss are finite, all four label classes are observable, and a checkpoint can be written and restored.</p></div>
+        </section>
+
+        <nav class="next-prev" aria-label="Adjacent pages"><a href="index.html"><span>Previous</span><strong>Reproduction hub</strong></a><a href="method.html"><span>Next</span><strong>Understand KinRT</strong></a></nav>
+      </main>
+    </div>
+    <footer class="site-footer"><div class="footer-inner"><span>KinRT reproducibility documentation</span><nav class="footer-links" aria-label="Footer"><a href="../README.md">README</a><a href="reference.html#artifacts">Artifact checklist</a><a href="reference.html#troubleshooting">Troubleshooting</a></nav></div></footer>
+  </body>
+</html>

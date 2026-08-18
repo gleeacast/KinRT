@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="KinRT configuration matrix, artifact checklist, commands, audit scope, and troubleshooting." />
+    <title>Reference | KinRT</title>
+    <link rel="stylesheet" href="styles.css?v=20260818-2" />
+    <script src="app.js?v=20260818-2" defer></script>
+  </head>
+  <body data-page="reference">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header"><div class="header-inner"><a class="brand" href="index.html"><span class="brand-mark">KR</span>KinRT</a><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="primary-nav">Menu</button><nav class="primary-nav" id="primary-nav" data-primary-nav aria-label="Primary navigation"><a href="getting-started.html" data-page-link="start">Start</a><a href="method.html" data-page-link="method">Method</a><a href="robotwin.html" data-page-link="robotwin">RoboTwin</a><a href="diyrobot.html" data-page-link="diyrobot">DIYRobot</a><a href="real-robot.html" data-page-link="hardware">Real robot</a><a href="reference.html" data-page-link="reference">Reference</a></nav></div></header>
+    <div class="release-strip"><div class="release-strip-inner"><span><span class="status-dot"></span><strong>Paper rows</strong> 14 identified</span><span><strong>Native OpenPI configs</strong> 9 confirmed</span><span><strong>External frameworks</strong> 5 identified</span></div></div>
+    <div class="page docs-shell">
+      <aside class="sidebar" aria-label="Documentation navigation">
+        <p class="sidebar-label">Reproduce</p><nav><a href="getting-started.html" data-page-link="start">Getting started</a><a href="method.html" data-page-link="method">Method</a><a href="robotwin.html" data-page-link="robotwin">RoboTwin</a><a href="diyrobot.html" data-page-link="diyrobot">DIYRobot</a><a href="real-robot.html" data-page-link="hardware">Real robot</a><a href="reference.html" data-page-link="reference">Reference</a></nav>
+        <div class="sidebar-divider"></div><p class="sidebar-label">On this page</p><nav><a href="#configs">Config registry</a><a href="#artifacts">Artifacts</a><a href="#commands">Commands</a><a href="#evaluation">Evaluation contract</a><a href="#troubleshooting">Troubleshooting</a><a href="#audit">Audit boundary</a></nav>
+      </aside>
+      <main class="doc-main" id="main">
+        <header class="doc-header">
+          <p class="kicker">Release reference</p><h1>Configs, artifacts, and diagnostics</h1>
+          <p class="doc-lead">Use this page to resolve a paper model name to an executable entry point, check required artifacts, and diagnose the first failing reproduction gate.</p>
+          <div class="doc-meta"><span>Registry source: PAPER_MODELS.json</span><span>Audit date: 2026-08-18</span></div>
+        </header>
+
+        <section class="section" id="configs">
+          <div class="section-head"><span class="section-index">01</span><div><h2>Paper model and configuration registry</h2></div></div>
+          <p>Every model name in the supplied table's first column was located. Nine are complete OpenPI configurations retained in this package. Five use separate frameworks and therefore remain external entry points rather than invented <code>TrainConfig</code> objects.</p>
+          <div class="filter-bar"><label for="config-filter">Filter rows</label><input id="config-filter" type="search" placeholder="Model, framework, config, or status" data-config-filter /><span data-config-count aria-live="polite"></span></div>
+          <div class="table-wrap"><table><thead><tr><th>Paper model</th><th>Framework</th><th>Release config / entry</th><th>Evidence</th></tr></thead><tbody>
+            <tr data-config-row><td>OpenVLA</td><td>OpenVLA</td><td><code>train_oft_robotwin_l20.sh</code></td><td><span class="tag external">External run confirmed</span></td></tr>
+            <tr data-config-row><td>RDT-1B</td><td>RDT-1B</td><td><code>finetune.sh</code></td><td><span class="tag external">Checkpoint confirmed</span></td></tr>
+            <tr data-config-row><td>pi0-Full</td><td>OpenPI</td><td><code>pi0_full_diyrobot</code></td><td><span class="tag">OpenPI config confirmed</span></td></tr>
+            <tr data-config-row><td>pi0-LoRA</td><td>OpenPI</td><td><code>pi0_lora_diyrobot</code></td><td><span class="tag">OpenPI config confirmed</span></td></tr>
+            <tr data-config-row><td>pi0.5-Full</td><td>OpenPI</td><td><code>pi05_full_diyrobot</code></td><td><span class="tag">OpenPI config confirmed</span></td></tr>
+            <tr data-config-row><td>pi0.5-LoRA</td><td>OpenPI</td><td><code>pi05_lora_diyrobot</code></td><td><span class="tag">OpenPI config confirmed</span></td></tr>
+            <tr data-config-row><td>Hi-MoE</td><td>Hi-MoE</td><td><code>scripts/train.py</code></td><td><span class="tag external">Checkpoint confirmed</span></td></tr>
+            <tr data-config-row><td>AdaMoE</td><td>AdaMoE</td><td><code>scripts/train.py</code></td><td><span class="tag external">Checkpoint confirmed</span></td></tr>
+            <tr data-config-row><td>KinRT-OpenVLA</td><td>OpenVLA</td><td><code>train_oft_robotwin_l20.sh</code> with K4 routing</td><td><span class="tag external">External run confirmed</span></td></tr>
+            <tr data-config-row><td>KinRT-Full (pi0)</td><td>OpenPI</td><td><code>kinrt_full_pi0_diyrobot</code></td><td><span class="tag">OpenPI config confirmed</span></td></tr>
+            <tr data-config-row><td>KinRT-LoRA (pi0)</td><td>OpenPI</td><td><code>kinrt_lora_pi0_diyrobot</code></td><td><span class="tag">OpenPI config confirmed</span></td></tr>
+            <tr data-config-row><td>KinRT-AdaMoE</td><td>OpenPI</td><td><code>kinrt_adamoe_diyrobot</code></td><td><span class="tag">OpenPI config confirmed</span></td></tr>
+            <tr data-config-row><td>KinRT-Full</td><td>OpenPI</td><td><code>kinrt_full_diyrobot</code></td><td><span class="tag">OpenPI config confirmed</span></td></tr>
+            <tr data-config-row><td>KinRT-LoRA</td><td>OpenPI</td><td><code>kinrt_lora_diyrobot</code></td><td><span class="tag">OpenPI config confirmed</span></td></tr>
+          </tbody></table></div>
+          <h3>Additional RoboTwin configs</h3>
+          <p>The FULL registry also contains <code>kinrt_full</code> and <code>kinrt_full_pi0</code>. The LORA registry also contains <code>kinrt_lora</code>. These are the primary 800-episode RoboTwin entries; the nine rows above are the paper's native OpenPI DIYRobot mappings.</p>
+          <div class="callout"><strong>Legacy rename</strong><p>The ambiguous source name <code>pi05_800_full</code> was separated into the explicit <code>kinrt_full</code> and <code>kinrt_lora</code> entries in one registry. The active release has no config registered under the legacy name.</p></div>
+        </section>
+
+        <section class="section" id="artifacts">
+          <div class="section-head"><span class="section-index">02</span><div><h2>Artifact checklist</h2></div></div>
+          <div class="table-wrap"><table><thead><tr><th>Artifact</th><th>Record</th><th>Verify before use</th></tr></thead><tbody>
+            <tr><td>Source tree</td><td>Unified release and provenance commits</td><td>Release validator and source manifest pass</td></tr>
+            <tr><td>Dataset</td><td>Repository ID, revision, digest, frame/episode counts</td><td>Schema, shapes, units, prompt set, and outcomes</td></tr>
+            <tr><td>Router labels</td><td>Generator args, summary, model, digest</td><td>All selected global indices have valid labels</td></tr>
+            <tr><td>Base parameters</td><td>Model family and checkpoint digest</td><td>PI0.5/PI0 family matches the config</td></tr>
+            <tr><td>Norm stats</td><td>Asset ID and digest</td><td>Generated from the same dataset/action contract</td></tr>
+            <tr><td>Fine-tuned checkpoint</td><td>Config, experiment, step, digest</td><td>Restores with matching assets</td></tr>
+            <tr><td>Simulator</td><td>RoboTwin commit and asset revision</td><td>One policy-free episode resets and renders</td></tr>
+            <tr><td>Hardware calibration</td><td>Robot ID, timestamp, operator, file digests</td><td>Rest, range, direction, and validation pass</td></tr>
+          </tbody></table></div>
+        </section>
+
+        <section class="section" id="commands">
+          <div class="section-head"><span class="section-index">03</span><div><h2>Command reference</h2></div></div>
+          <div class="table-wrap"><table><thead><tr><th>Stage</th><th>Command</th></tr></thead><tbody>
+            <tr><td>Install</td><td><code>uv sync --frozen</code></td></tr>
+            <tr><td>Labels</td><td><code>uv run python scripts/generate_router_labels.py --repo-root ...</code></td></tr>
+            <tr><td>Norm stats</td><td><code>uv run python scripts/compute_norm_stats.py --config-name ...</code></td></tr>
+            <tr><td>Train</td><td><code>uv run python scripts/train.py CONFIG --exp-name NAME</code></td></tr>
+            <tr><td>RoboTwin server</td><td><code>bash serve_remote_model.sh deploy_policy.yml</code></td></tr>
+            <tr><td>RoboTwin remote client</td><td><code>MODEL_SERVER_HOST=... bash eval_remote.sh TASK GPU</code></td></tr>
+            <tr><td>HiArm offline test</td><td><code>OFFLINE_SELF_TEST=1 ./start_hiarm_pi05_policy_client.sh</code></td></tr>
+            <tr><td>HiArm dry policy</td><td><code>POLICY_SERVER=... TASK_ID=0 ./start_hiarm_pi05_policy_client.sh</code></td></tr>
+            <tr><td>Release validation</td><td><code>python tools/validate_release.py --check-manifests</code></td></tr>
+            <tr><td>Local website</td><td><code>python -m http.server 8080 --directory docs</code></td></tr>
+          </tbody></table></div>
+        </section>
+
+        <section class="section" id="evaluation">
+          <div class="section-head"><span class="section-index">04</span><div><h2>Evaluation contract</h2></div></div>
+          <div class="checklist">
+            <div class="check-item"><strong>Session isolation</strong><p>One independent policy session per socket connection.</p></div>
+            <div class="check-item"><strong>Typed transport</strong><p>Numpy dtype and shape metadata; bfloat16 serialized as float32.</p></div>
+            <div class="check-item"><strong>Episode records</strong><p>Success, seed, elapsed time, action count, checkpoint, and telemetry path.</p></div>
+            <div class="check-item"><strong>Completion</strong><p>All requested episodes must have result records before evaluation is complete.</p></div>
+          </div>
+          <p>LORA preserves connections after structured model errors when possible and isolates non-transport episode failures. FULL has broader FFN activation telemetry. These differences affect robustness and observability, not the routing objective.</p>
+        </section>
+
+        <section class="section" id="troubleshooting">
+          <div class="section-head"><span class="section-index">05</span><div><h2>Troubleshooting by first failing gate</h2></div></div>
+          <div class="table-wrap"><table><thead><tr><th>Symptom</th><th>Likely boundary</th><th>Action</th></tr></thead><tbody>
+            <tr><td><code>uv sync</code> cannot resolve a workspace package</td><td>Incomplete source copy</td><td>Confirm <code>packages/openpi-client</code> exists and use the included lockfile.</td></tr>
+            <tr><td>JAX lists CPU only</td><td>GPU driver/runtime</td><td>Resolve CUDA/JAX installation before any training diagnosis.</td></tr>
+            <tr><td>Router label index error</td><td>Dataset/label mismatch</td><td>Regenerate labels from the exact dataset and check global index coverage.</td></tr>
+            <tr><td>Missing or unstable norm stats</td><td>Asset identity</td><td>Recompute with the exact selected config and dataset.</td></tr>
+            <tr><td>Checkpoint restore shape mismatch</td><td>Backbone or FULL/LoRA mismatch</td><td>Verify config name, model family, ranks, and checkpoint source.</td></tr>
+            <tr><td>RoboTwin task module missing</td><td>Incomplete simulator checkout</td><td>Restore the compatible <code>envs/</code> and task assets.</td></tr>
+            <tr><td>Evaluation returns fewer trials</td><td>Partial run or transport loss</td><td>Count result records, inspect errors, and resume with explicit seed accounting.</td></tr>
+            <tr><td>HiArm startup mismatch</td><td>Pose/calibration</td><td>Stop before motion; restore the pose or recalibrate the affected joint.</td></tr>
+            <tr><td>Missing follower feedback</td><td>USB-CAN/wiring</td><td>Disable torque, inspect the relevant bus, and repeat passive checks.</td></tr>
+            <tr><td>Camera open or wrong image</td><td>Device contention/mapping</td><td>Stop preview processes and verify by-id paths and semantic views.</td></tr>
+            <tr><td>Policy response stale</td><td>Network/server latency</td><td>Stop motion, inspect server load and transport, then repeat the dry gate.</td></tr>
+          </tbody></table></div>
+        </section>
+
+        <section class="section" id="audit">
+          <div class="section-head"><span class="section-index">06</span><div><h2>Audit boundary and unresolved items</h2></div></div>
+          <ul>
+            <li>The KinRT sources and configuration mappings were statically audited and validated; full training was not rerun in this documentation build.</li>
+            <li>The HiArm source was inspected remotely with read-only commands. No remote file was edited and no hardware process was started.</li>
+            <li>No real-robot calibration, camera stream, bus feedback, torque enable, collection, or motion was executed by this audit.</li>
+            <li>The complete RoboTwin simulator and large artifacts are external, so end-to-end numeric reproduction remains dependent on their release.</li>
+            <li>The paper label “Pull Bottle” conflicts with the active prompt-v3 pill-box pulling task and must be resolved before publication.</li>
+            <li>Historical HiArm documents contain stale port mappings and older camera names; this website uses the current active launchers and requires device discovery.</li>
+          </ul>
+          <div class="callout warning"><strong>Publication rule</strong><p>Do not describe an external artifact or an unexecuted hardware test as included, verified, or reproduced. State the exact boundary in the release notes.</p></div>
+        </section>
+        <nav class="next-prev" aria-label="Adjacent pages"><a href="real-robot.html"><span>Previous</span><strong>Real robot</strong></a><a href="index.html"><span>Return</span><strong>Reproduction hub</strong></a></nav>
+      </main>
+    </div>
+    <footer class="site-footer"><div class="footer-inner"><span>KinRT reproducibility documentation</span><nav class="footer-links" aria-label="Footer"><a href="PAPER_MODEL_CONFIG_MAP.md">Model mapping</a><a href="../CHANGELOG_AND_SOURCE_MANIFEST.md">Change record</a><a href="../REAL_ROBOT_AUDIT.md">Hardware audit</a></nav></div></footer>
+  </body>
+</html>

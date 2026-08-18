@@ -1,0 +1,6 @@
+* text=auto eol=lf
+
+*.jpg binary
+*.png binary
+*.ipynb text eol=lf
+*.lock text eol=lf

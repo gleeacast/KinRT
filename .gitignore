@@ -1,0 +1,16 @@
+__pycache__/
+.pytest_cache/
+*.py[cod]
+*.bak*
+*.orig
+*.rej
+*.log
+*.pid
+.venv*/
+checkpoints/
+/assets/
+wandb/
+logs/
+results/
+training_data/
+processed_data/

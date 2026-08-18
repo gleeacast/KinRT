@@ -1,0 +1,24 @@
+policy_name: pi05
+task_name: YOUR_TASK_NAME
+task_config: demo_clean
+ckpt_setting: kinrt_lora_checkpoint
+seed: 0
+test_num: 50
+instruction_type: unseen
+eval_result_root: ./eval_result
+router_info_root: ./eval_result/router_info
+
+server_bind_host: 0.0.0.0
+model_server_host: 127.0.0.1
+port: 8001
+server_gpu_id: 0
+eval_gpu_id: 0
+
+train_config_name: kinrt_lora
+model_name: YOUR_EXPERIMENT_NAME
+checkpoint_id: 10000
+checkpoint_dir: ./policy/pi05/checkpoints
+pi0_step: 50
+
+record_router_info: true
+router_info_compress: false

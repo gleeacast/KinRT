@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="KinRT: kinematics-guided routing for generalizable robot manipulation." />
+    <meta name="theme-color" content="#ffffff" />
+    <title>KinRT | Kinematics-Guided Routing</title>
+    <link rel="stylesheet" href="styles.css?v=20260818-2" />
+    <script src="app.js?v=20260818-2" defer></script>
+  </head>
+  <body data-page="home">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="brand" href="index.html"><span class="brand-mark">KR</span>KinRT</a>
+        <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="primary-nav">Menu</button>
+        <nav class="primary-nav" id="primary-nav" data-primary-nav aria-label="Primary navigation">
+          <a href="getting-started.html" data-page-link="start">Start</a>
+          <a href="method.html" data-page-link="method">Method</a>
+          <a href="robotwin.html" data-page-link="robotwin">RoboTwin</a>
+          <a href="diyrobot.html" data-page-link="diyrobot">DIYRobot</a>
+          <a href="real-robot.html" data-page-link="hardware">Real robot</a>
+          <a href="reference.html" data-page-link="reference">Reference</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="page home" id="main">
+      <section class="home-hero" aria-labelledby="page-title">
+        <p class="kicker">Open-source reproduction</p>
+        <h1 id="page-title">KinRT</h1>
+        <p class="home-subtitle">Kinematics-guided routing for generalizable robot manipulation.</p>
+        <p class="home-summary">Future action structure supervises a four-expert router during training. Deployment selects one expert from the current visual, language, and proprioceptive observation only.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="getting-started.html">Start reproducing</a>
+          <a class="button secondary" href="method.html">Understand the method</a>
+        </div>
+        <div class="method-facts" aria-label="KinRT settings">
+          <span>4 experts</span><span>Top-1 routing</span><span>50-step actions</span><span>Observation-only inference</span>
+        </div>
+      </section>
+
+      <figure class="hero-figure">
+        <img src="assets/images/kinrt-pipeline.png" alt="KinRT pipeline from action-derived kinematic labels to observation-conditioned routing" />
+        <figcaption>Action-derived clusters supervise the route during training; future actions and router labels are absent at inference.</figcaption>
+      </figure>
+
+      <section class="home-section" aria-labelledby="method-title">
+        <div class="section-intro">
+          <p class="kicker">Method</p>
+          <h2 id="method-title">Three stages, one routing decision</h2>
+          <p>KinRT adds explicit kinematic supervision without changing the information available to the deployed policy.</p>
+        </div>
+        <div class="stage-grid">
+          <article><span>01</span><h3>Build labels</h3><p>Encode 50-step action chunks, standardize them, project to PCA-64, and cluster into four motion archetypes.</p></article>
+          <article><span>02</span><h3>Train the router</h3><p>Mean-pool valid observation-prefix tokens and optimize a dense router with frame-aligned cluster labels.</p></article>
+          <article><span>03</span><h3>Route at inference</h3><p>Select one residual expert for the action chunk using only the current observation and instruction.</p></article>
+        </div>
+      </section>
+
+      <section class="home-section" aria-labelledby="parameterization-title">
+        <div class="section-intro">
+          <p class="kicker">Single source tree</p>
+          <h2 id="parameterization-title">One KinRT implementation, two training choices</h2>
+          <p>FULL and LoRA share the same router, experts, labels, loss, and inference path. Select a configuration name; do not switch source directories.</p>
+        </div>
+        <div class="table-wrap comparison-table"><table><thead><tr><th>Setting</th><th><code>kinrt_full</code></th><th><code>kinrt_lora</code></th></tr></thead><tbody>
+          <tr><td>Dense base</td><td>Trainable</td><td>Frozen</td></tr>
+          <tr><td>PaliGemma</td><td><code>gemma_2b</code></td><td><code>gemma_2b_lora</code>, rank 32</td></tr>
+          <tr><td>Action expert</td><td><code>gemma_300m</code></td><td><code>gemma_300m_lora</code>, rank 64</td></tr>
+          <tr><td>RoboTwin steps / batch</td><td>10,000 / 32</td><td>10,000 / 32</td></tr>
+          <tr><td>Checkpoint interval</td><td>500 steps</td><td>1,000 steps</td></tr>
+        </tbody></table></div>
+        <p class="section-link"><a href="method.html#variants">See the exact parameterization contract</a></p>
+      </section>
+
+      <section class="home-section" aria-labelledby="benchmarks-title">
+        <div class="section-intro">
+          <p class="kicker">Reproduction tracks</p>
+          <h2 id="benchmarks-title">Simulation and real-world workflows</h2>
+          <p>The release connects one policy implementation to both evaluation tracks while keeping datasets, checkpoints, simulator assets, and robot control authority explicit.</p>
+        </div>
+        <div class="benchmark-grid">
+          <a href="robotwin.html" class="benchmark-link">
+            <img src="assets/images/posters/robotwin-05_place_dual_shoes_random.jpg" alt="RoboTwin randomized bimanual manipulation task" loading="lazy" />
+            <span>RoboTwin 2.0</span><strong>Eight tasks, clean and randomized</strong>
+          </a>
+          <a href="diyrobot.html" class="benchmark-link">
+            <img src="assets/images/diyrobot-platform.png" alt="DIYRobot bimanual manipulation platform" loading="lazy" />
+            <span>DIYRobot</span><strong>Five training tasks and one OOD scene</strong>
+          </a>
+        </div>
+      </section>
+
+      <section class="home-section quickstart" aria-labelledby="quick-title">
+        <div class="section-intro">
+          <p class="kicker">Quick start</p>
+          <h2 id="quick-title">Validate the release first</h2>
+          <p>The source, all 12 retained configs, comments, local links, assets, and SHA-256 manifest are checked before training.</p>
+        </div>
+        <div class="code-block">
+          <div class="code-toolbar"><span>KinRT release</span><button class="copy-button" type="button" data-copy>Copy</button></div>
+          <pre><code>cd /path/to/KinRT
+python tools/validate_release.py --check-manifests
+
+cd policy/pi05
+uv sync --frozen
+uv run python scripts/compute_norm_stats.py --config-name kinrt_lora</code></pre>
+        </div>
+        <nav class="guide-links" aria-label="Reproduction guides">
+          <a href="getting-started.html"><strong>Installation</strong><span>Environment, artifacts, and first training gate</span></a>
+          <a href="robotwin.html"><strong>RoboTwin</strong><span>Simulation training and evaluation</span></a>
+          <a href="real-robot.html"><strong>HiArm</strong><span>Read-only audit and guarded deployment</span></a>
+        </nav>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-inner"><span>KinRT reproducibility documentation</span><nav class="footer-links" aria-label="Footer"><a href="../README.md">README</a><a href="reference.html#audit">Audit boundary</a><a href="reference.html#troubleshooting">Troubleshooting</a></nav></div>
+    </footer>
+  </body>
+</html>

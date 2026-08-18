@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="KinRT method, routing objective, implementation path, and FULL versus LoRA parameterization." />
+    <title>Method | KinRT</title>
+    <link rel="stylesheet" href="styles.css?v=20260818-2" />
+    <script src="app.js?v=20260818-2" defer></script>
+  </head>
+  <body data-page="method">
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header"><div class="header-inner"><a class="brand" href="index.html"><span class="brand-mark">KR</span>KinRT</a><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="primary-nav">Menu</button><nav class="primary-nav" id="primary-nav" data-primary-nav aria-label="Primary navigation"><a href="getting-started.html" data-page-link="start">Start</a><a href="method.html" data-page-link="method">Method</a><a href="robotwin.html" data-page-link="robotwin">RoboTwin</a><a href="diyrobot.html" data-page-link="diyrobot">DIYRobot</a><a href="real-robot.html" data-page-link="hardware">Real robot</a><a href="reference.html" data-page-link="reference">Reference</a></nav></div></header>
+    <div class="release-strip"><div class="release-strip-inner"><span><span class="status-dot"></span><strong>Terminology</strong> KinRT is the method</span><span><strong>FULL / LoRA</strong> parameterization only</span><span><strong>Inference</strong> observation-only</span></div></div>
+    <div class="page docs-shell">
+      <aside class="sidebar" aria-label="Documentation navigation">
+        <p class="sidebar-label">Reproduce</p><nav><a href="getting-started.html" data-page-link="start">Getting started</a><a href="method.html" data-page-link="method">Method</a><a href="robotwin.html" data-page-link="robotwin">RoboTwin</a><a href="diyrobot.html" data-page-link="diyrobot">DIYRobot</a><a href="real-robot.html" data-page-link="hardware">Real robot</a><a href="reference.html" data-page-link="reference">Reference</a></nav>
+        <div class="sidebar-divider"></div><p class="sidebar-label">On this page</p><nav><a href="#definition">Definition</a><a href="#labels">Offline labels</a><a href="#router">Router and experts</a><a href="#loss">Training objective</a><a href="#variants">FULL and LoRA</a><a href="#implementation">Code path</a><a href="#interpretation">Interpretation limits</a></nav>
+      </aside>
+      <main class="doc-main" id="main">
+        <header class="doc-header">
+          <p class="kicker">Method reference</p><h1>How KinRT works</h1>
+          <p class="doc-lead">KinRT converts future action structure into supervised routing labels during training, then predicts the route from the current observation alone. FULL and LoRA retain this exact information flow.</p>
+          <div class="doc-meta"><span>Experts: 4</span><span>Top-K: 1</span><span>Action horizon: 50</span><span>Router loss coefficient: 0.05</span></div>
+        </header>
+
+        <section class="section" id="definition">
+          <div class="section-head"><span class="section-index">01</span><div><h2>Define the method precisely</h2></div></div>
+          <p>KinRT is the source implementation in which offline action-motion clusters supervise a learned global router over residual feed-forward experts in the PI0.5 or PI0 action expert. The router is trained against frame-aligned hard labels. Those labels and future actions are not available at inference time.</p>
+          <figure class="figure"><img src="assets/images/kinrt-pipeline.png" alt="KinRT method pipeline" /><figcaption>The asymmetric information path is intentional: future actions create labels offline, while the deployed router receives pooled observation context only.</figcaption></figure>
+          <div class="callout"><strong>Naming rule</strong><p>Use <em>KinRT</em> for the routing method. Append FULL or LoRA only when identifying the optimization regime or a concrete checkpoint.</p></div>
+        </section>
+
+        <section class="section" id="labels">
+          <div class="section-head"><span class="section-index">02</span><div><h2>Construct frame-aligned kinematic labels</h2></div></div>
+          <p>For every dataset frame, the label generator takes a future action chunk of length 50. Episode tails are padded by repeating the final action. In the reported <code>chunk_velocity</code> setting, it concatenates the flattened chunk and its first temporal difference.</p>
+          <div class="code-block"><div class="code-toolbar"><span>Feature definition</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>chunk = a[t : t + 50]
+velocity = diff(chunk, axis=time)
+feature = concat(flatten(chunk), flatten(velocity))
+
+# For a 14-D action: 50 * 14 + 49 * 14 = 1,386 values.</code></pre></div>
+          <p>The generator fits a standard scaler, an Incremental PCA projection to 64 dimensions, and KMeans with four clusters. It writes <code>router_labels.npy</code> indexed by the dataset's global <code>index</code>, plus the sample indices, cluster model, centers, episode summary, and run metadata.</p>
+          <div class="table-wrap"><table><thead><tr><th>Reported RoboTwin label artifact</th><th>Value</th></tr></thead><tbody>
+            <tr><td>Episodes / frames</td><td>800 / 162,545</td></tr>
+            <tr><td>Raw / PCA dimensions</td><td>1,386 / 64</td></tr>
+            <tr><td>Clusters</td><td>4</td></tr>
+            <tr><td>Cluster counts</td><td>59,018; 74,748; 7,182; 21,597</td></tr>
+            <tr><td>Label SHA-256</td><td><code>bceda7104ee949d37c9872a50c06842a111387ad5b63eb9011d50e19b33b256a</code></td></tr>
+          </tbody></table></div>
+        </section>
+
+        <section class="section" id="router">
+          <div class="section-head"><span class="section-index">03</span><div><h2>Route from the observation prefix</h2></div></div>
+          <p>PI0.5 encodes visual inputs, language, and proprioceptive state into prefix tokens. KinRT applies a validity mask and mean-pools those tokens into one vector per sample. A dense router produces four logits, selects one expert, and broadcasts the selected route across action tokens and action-expert transformer depth.</p>
+          <div class="flow">
+            <div class="flow-step"><span>INPUT</span><strong>Valid prefix tokens</strong><p>Vision, prompt, and state features.</p></div>
+            <div class="flow-step"><span>POOL</span><strong>Masked mean</strong><p>One routing context vector per sample.</p></div>
+            <div class="flow-step"><span>ROUTE</span><strong>Four logits, Top-1</strong><p>One global expert decision.</p></div>
+            <div class="flow-step"><span>BLOCK</span><strong>Shared plus routed FFN</strong><p>The selected expert is a residual branch.</p></div>
+          </div>
+          <p>The ordinary dense feed-forward path remains active. The routed expert output is added as a residual pathway; it does not replace the shared feed-forward computation.</p>
+        </section>
+
+        <section class="section" id="loss">
+          <div class="section-head"><span class="section-index">04</span><div><h2>Optimize action prediction and routing together</h2></div></div>
+          <div class="code-block"><div class="code-toolbar"><span>Active objective</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>L_total = L_flow_matching + 0.05 * L_router_cross_entropy</code></pre></div>
+          <p>The active reported configs set load-balance, entropy, contrastive, dead-expert, action-gradient, and action-loss weighting coefficients to zero. Balanced replacement sampling uses class count to the power <code>-0.5</code>, reducing label imbalance without forcing a uniform stream.</p>
+          <div class="callout warning"><strong>Do not add silent objectives.</strong><p>Enabling an auxiliary coefficient or changing sampling semantics produces a different experiment, even when the config retains a KinRT name.</p></div>
+        </section>
+
+        <section class="section" id="variants">
+          <div class="section-head"><span class="section-index">05</span><div><h2>Separate method identity from parameterization</h2></div></div>
+          <div class="table-wrap"><table><thead><tr><th>Setting</th><th><code>kinrt_full</code></th><th><code>kinrt_lora</code></th></tr></thead><tbody>
+            <tr><td>KinRT labels, router, experts, Top-K</td><td>Same</td><td>Same</td></tr>
+            <tr><td>PaliGemma branch</td><td><code>gemma_2b</code></td><td><code>gemma_2b_lora</code>, rank 32</td></tr>
+            <tr><td>Action-expert branch</td><td><code>gemma_300m</code></td><td><code>gemma_300m_lora</code>, rank 64</td></tr>
+            <tr><td>Frozen base parameters</td><td>No</td><td>Yes</td></tr>
+            <tr><td>Steps / batch</td><td>10,000 / 32</td><td>10,000 / 32</td></tr>
+            <tr><td>FSDP devices</td><td>1</td><td>2</td></tr>
+            <tr><td>Save interval</td><td>500</td><td>1,000</td></tr>
+            <tr><td>EMA</td><td>Disabled</td><td>Disabled</td></tr>
+          </tbody></table></div>
+          <p>The retained code comments use this distinction: KinRT names the method; the nearby sentence states whether all base parameters or only LoRA/router/expert parameters are trainable.</p>
+        </section>
+
+        <section class="section" id="implementation">
+          <div class="section-head"><span class="section-index">06</span><div><h2>Follow the implementation path</h2></div></div>
+          <div class="table-wrap"><table><thead><tr><th>Stage</th><th>Authoritative file</th><th>Responsibility</th></tr></thead><tbody>
+            <tr><td>Label generation</td><td><code>scripts/generate_router_labels.py</code></td><td>Chunk features, PCA, KMeans, global-index labels</td></tr>
+            <tr><td>Data loading</td><td><code>src/openpi/training/data_loader.py</code></td><td>Label alignment and balanced sampling</td></tr>
+            <tr><td>Loss integration</td><td><code>src/openpi/models/pi0.py</code></td><td>Pooled context and supervised router loss</td></tr>
+            <tr><td>Routing</td><td><code>src/openpi/models/gemma.py</code></td><td>Top-1 decision and residual routed FFNs</td></tr>
+            <tr><td>Training</td><td><code>scripts/train.py</code></td><td>Optimization and checkpoints</td></tr>
+            <tr><td>Inference</td><td><code>pi_model.py</code></td><td>Policy session and action chunks</td></tr>
+            <tr><td>RoboTwin evaluation</td><td><code>script/eval_policy*.py</code></td><td>Episodes, metrics, failures, telemetry</td></tr>
+          </tbody></table></div>
+        </section>
+
+        <section class="section" id="interpretation">
+          <div class="section-head"><span class="section-index">07</span><div><h2>Respect interpretation limits</h2></div></div>
+          <ul>
+            <li>Cluster IDs are not stable semantics across independently fitted KMeans models.</li>
+            <li>A dominant cluster in one task does not establish one-expert-per-task specialization.</li>
+            <li>FULL and LoRA checkpoints are separate training outcomes and must be named explicitly in results.</li>
+            <li>Router telemetry is meaningful only with the matching checkpoint, label model, and dataset revision.</li>
+            <li>Observation-only routing must be verified at deployment; future actions or labels must not enter the inference request.</li>
+          </ul>
+          <figure class="figure"><img src="assets/images/cluster-map.png" alt="Empirical KinRT cluster occupancy map" loading="lazy" /><figcaption>Cluster occupancy supports inspection of learned routing behavior, not fixed semantic relabeling.</figcaption></figure>
+        </section>
+
+        <nav class="next-prev" aria-label="Adjacent pages"><a href="getting-started.html"><span>Previous</span><strong>Getting started</strong></a><a href="robotwin.html"><span>Next</span><strong>RoboTwin reproduction</strong></a></nav>
+      </main>
+    </div>
+    <footer class="site-footer"><div class="footer-inner"><span>KinRT reproducibility documentation</span><nav class="footer-links" aria-label="Footer"><a href="KINRT_IMPLEMENTATION.md">Implementation notes</a><a href="FULL_VS_LORA.md">Variant comparison</a><a href="reference.html#audit">Audit boundary</a></nav></div></footer>
+  </body>
+</html>
