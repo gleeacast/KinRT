@@ -628,7 +628,7 @@ tbody tr:hover td { background: #f8fafb; }
 .resource-button.paper .resource-label img,
 .resource-button.code .resource-label img { filter: invert(1); }
 .resource-button.paper .resource-value { background: #b3261e; }
-.resource-button.models .resource-value { background: #e87528; }
+.resource-button.models .resource-value { background: #ffd166; color: #202124; }
 .resource-button.code .resource-value { background: #161616; }
 .resource-button.license .resource-value { background: #7a8288; }
 .resource-button.reproduce .resource-value { background: #087b70; }
