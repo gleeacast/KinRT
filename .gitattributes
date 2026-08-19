@@ -1,6 +1,7 @@
 * text=auto eol=lf
 
 *.jpg binary
+*.mp4 binary
 *.png binary
 *.ipynb text eol=lf
 *.lock text eol=lf
