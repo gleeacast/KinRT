@@ -3,162 +3,192 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="DIYRobot data collection, KinRT training, serving, and real-world evaluation workflow." />
+    <meta name="description" content="DIYRobot hardware, calibration, camera alignment, data collection, KinRT training, and evaluation." />
     <title>DIYRobot Reproduction | KinRT</title>
-    <link rel="stylesheet" href="styles.css?v=20260818-4" />
+    <link rel="stylesheet" href="styles.css?v=20260819-1" />
     <script src="app.js?v=20260818-2" defer></script>
   </head>
   <body data-page="diyrobot">
     <a class="skip-link" href="#main">Skip to content</a>
-    <header class="site-header"><div class="header-inner"><a class="brand" href="index.html"><span class="brand-mark">KR</span>KinRT</a><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="primary-nav">Menu</button><nav class="primary-nav" id="primary-nav" data-primary-nav aria-label="Primary navigation"><a href="getting-started.html" data-page-link="start">Start</a><a href="method.html" data-page-link="method">Method</a><a href="robotwin.html" data-page-link="robotwin">RoboTwin</a><a href="diyrobot.html" data-page-link="diyrobot">DIYRobot</a><a href="real-robot.html" data-page-link="hardware">Real robot</a><a href="reference.html" data-page-link="reference">Reference</a></nav></div></header>
-    <div class="release-strip"><div class="release-strip-inner"><span><span class="status-dot"></span><strong>Dataset</strong> LeRobot v2.1</span><span><strong>Control/data rate</strong> 20 FPS</span><span><strong>Evaluation</strong> 5 tasks x 50 trials</span><span><span class="status-dot external"></span><strong>Physical supervision</strong> required</span></div></div>
+    <header class="site-header"><div class="header-inner"><a class="brand" href="index.html"><span class="brand-mark">KR</span>KinRT</a><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="primary-nav">Menu</button><nav class="primary-nav" id="primary-nav" data-primary-nav aria-label="Primary navigation"><a href="getting-started.html" data-page-link="start">Start</a><a href="method.html" data-page-link="method">Method</a><a href="robotwin.html" data-page-link="robotwin">RoboTwin</a><a href="diyrobot.html" data-page-link="diyrobot">DIYRobot</a><a href="reference.html" data-page-link="reference">Reference</a></nav></div></header>
+    <div class="release-strip"><div class="release-strip-inner"><span><span class="status-dot"></span><strong>Source</strong> lower host released</span><span><strong>Control/data</strong> 20 FPS</span><span><strong>Evaluation</strong> 5 x 50 + 100 OOD</span><span><span class="status-dot external"></span><strong>CAD</strong> pending</span></div></div>
+
     <div class="page docs-shell">
       <aside class="sidebar" aria-label="Documentation navigation">
-        <p class="sidebar-label">Reproduce</p><nav><a href="getting-started.html" data-page-link="start">Getting started</a><a href="method.html" data-page-link="method">Method</a><a href="robotwin.html" data-page-link="robotwin">RoboTwin</a><a href="diyrobot.html" data-page-link="diyrobot">DIYRobot</a><a href="real-robot.html" data-page-link="hardware">Real robot</a><a href="reference.html" data-page-link="reference">Reference</a></nav>
-        <div class="sidebar-divider"></div><p class="sidebar-label">On this page</p><nav><a href="#contract">Data contract</a><a href="#tasks">Five tasks</a><a href="#collect">Collect</a><a href="#inspect">Inspect</a><a href="#train">Train</a><a href="#serve">Serve</a><a href="#evaluate">Evaluate</a><a href="#configs">Configs</a></nav>
+        <p class="sidebar-label">Reproduce</p><nav><a href="getting-started.html" data-page-link="start">Getting started</a><a href="method.html" data-page-link="method">Method</a><a href="robotwin.html" data-page-link="robotwin">RoboTwin</a><a href="diyrobot.html" data-page-link="diyrobot">DIYRobot</a><a href="reference.html" data-page-link="reference">Reference</a></nav>
+        <div class="sidebar-divider"></div><p class="sidebar-label">On this page</p><nav><a href="#status">Release status</a><a href="#hardware">Hardware</a><a href="#install">Install</a><a href="#devices">Devices</a><a href="#calibration">Calibration</a><a href="#cameras">Cameras</a><a href="#collect">Collect</a><a href="#train">Train</a><a href="#deploy">Deploy</a><a href="#report">Report</a></nav>
       </aside>
+
       <main class="doc-main" id="main">
         <header class="doc-header">
-          <p class="kicker">Physical benchmark</p><h1>Reproduce DIYRobot</h1>
-          <p class="doc-lead">Build one internally consistent five-task dataset, retain the 14-D action contract through training and serving, and evaluate a fixed checkpoint under supervised, repeatable physical conditions.</p>
-          <div class="doc-meta"><span>Five tasks</span><span>Three RGB views</span><span>14-D state/action</span><span>50 trials per task</span></div>
+          <p class="kicker">Physical benchmark</p><h1>Build and reproduce DIYRobot</h1>
+          <p class="doc-lead">DIYRobot is the single physical platform used by KinRT. This page connects the released lower-host source, hardware contract, zeroing, three-camera alignment, LeRobot data, KinRT training, and guarded evaluation in one workflow.</p>
+          <div class="doc-meta"><span>14 follower joints</span><span>Three RGB views</span><span>14-D state/action</span><span>Qualified operator required</span></div>
         </header>
 
-        <section class="section" id="contract">
-          <div class="section-head"><span class="section-index">01</span><div><h2>Freeze the data contract</h2></div></div>
-          <p>The active recorder writes LeRobot v2.1. Each frame contains follower state, the actual follower target sent by the controller, three images, and a natural-language task. Strict-teleop JSONL files are diagnostics and must not be used as training data.</p>
-          <div class="table-wrap"><table><thead><tr><th>Field</th><th>Meaning</th><th>Shape / unit</th></tr></thead><tbody>
-            <tr><td><code>observation.state</code></td><td>Follower absolute joint positions</td><td>14, degrees</td></tr>
-            <tr><td><code>action</code></td><td>Follower absolute targets actually sent</td><td>14, degrees</td></tr>
-            <tr><td><code>observation.images.right_gripper</code></td><td>Right wrist/gripper RGB view</td><td>640 x 480</td></tr>
-            <tr><td><code>observation.images.left_gripper</code></td><td>Left wrist/gripper RGB view</td><td>640 x 480</td></tr>
-            <tr><td><code>observation.images.overhead</code></td><td>High/overhead RGB view</td><td>640 x 480</td></tr>
-            <tr><td><code>task</code></td><td>Episode instruction</td><td>UTF-8 text</td></tr>
-          </tbody></table></div>
-          <p>The OpenPI configs map capture keys to policy keys:</p>
-          <div class="code-block"><div class="code-toolbar"><span>Training camera map</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>cam_high        &lt;- observation.images.overhead
-cam_left_wrist  &lt;- observation.images.left_gripper
-cam_right_wrist &lt;- observation.images.right_gripper</code></pre></div>
-          <ol class="joint-list"><li>left_shoulder_pan</li><li>left_shoulder_lift</li><li>left_elbow_flex</li><li>left_wrist_pitch</li><li>left_wrist_flex</li><li>left_wrist_roll</li><li>left_gripper</li><li>right_shoulder_pan</li><li>right_shoulder_lift</li><li>right_elbow_flex</li><li>right_wrist_pitch</li><li>right_wrist_flex</li><li>right_wrist_roll</li><li>right_gripper</li></ol>
+        <section class="section" id="status">
+          <div class="section-head"><span class="section-index">01</span><div><h2>Know what is reproducible today</h2></div></div>
+          <p>The public release now includes the reviewed lower-host implementation under <code>hardware/diyrobot/lower_host</code>, source hashes, calibration procedures, and camera-reference data. The source host was read only: no remote file or hardware state was changed during this audit.</p>
+          <div class="callout warning"><strong>Mechanical release is incomplete.</strong><p>CAD, link and frame dimensions, camera-mount geometry, wiring drawings, task-mat dimensions, and a printable reference mat will be released later. Do not derive them from photographs or claim a mechanically identical reproduction before those artifacts are available.</p></div>
+          <p>DIYRobot is the only public platform and runtime name. The earlier internal name appears only in immutable source-provenance and historical-checkpoint records; it does not identify a second robot or a public code path.</p>
+          <p><a href="https://github.com/gleeacast/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA/tree/main/hardware/diyrobot">Open the DIYRobot source and full operator documentation</a>.</p>
         </section>
 
-        <section class="section" id="tasks">
-          <div class="section-head"><span class="section-index">02</span><div><h2>Use the current prompt-v3 task semantics</h2></div></div>
-          <p>The audited lower-host launcher currently defines these canonical prompts. Use the exact canonical prompt for the primary evaluation and record any paraphrase index separately.</p>
-          <div class="poster-grid">
-            <div class="poster-item"><img src="assets/images/posters/diyrobot-01_handover_pen.jpg" alt="DIYRobot pen handover task" /><span>Right-to-left pen handover and insertion</span></div>
-            <div class="poster-item"><img src="assets/images/posters/diyrobot-02_place_pill_box.jpg" alt="DIYRobot pill box placement task" /><span>Place pill box at notebook center</span></div>
-            <div class="poster-item"><img src="assets/images/posters/diyrobot-03_rotate_screwdriver.jpg" alt="DIYRobot screwdriver rotation task" /><span>Rotate screwdriver 90 degrees clockwise</span></div>
-            <div class="poster-item"><img src="assets/images/posters/diyrobot-04_pull_pill_box.jpg" alt="DIYRobot pill box pulling task" /><span>Pull pill box onto adjacent black pad</span></div>
-            <div class="poster-item"><img src="assets/images/posters/diyrobot-05_press_button.jpg" alt="DIYRobot button pressing task" /><span>Press green button once to change indicator</span></div>
-          </div>
-          <div class="callout warning"><strong>Paper/source naming discrepancy</strong><p>The supplied paper table labels the fourth DIYRobot column “Pull Bottle,” while the current prompt-v3 launcher and poster asset describe pulling a pill box. Confirm the intended public benchmark name before publishing final results; do not silently treat the labels as interchangeable.</p></div>
+        <section class="section" id="hardware">
+          <div class="section-head"><span class="section-index">02</span><div><h2>Assemble the verified electrical topology</h2></div></div>
+          <figure class="figure"><img src="assets/images/hardware-stack.png" alt="DIYRobot hardware and control topology" /><figcaption>The lower host owns cameras and actuator buses; the GPU host owns KinRT inference.</figcaption></figure>
+          <div class="table-wrap"><table><thead><tr><th>Subsystem</th><th>Verified hardware</th><th>Addressing</th></tr></thead><tbody>
+            <tr><td>Leader arms</td><td>14 Feetech STS3215</td><td>Left 1-7; right 8-14</td></tr>
+            <tr><td>Follower arms</td><td>14 RobStride O3</td><td>Left 1-7; right 11-17</td></tr>
+            <tr><td>Mobile base</td><td>Three Damiao DM4310</td><td><code>0x21</code>, <code>0x22</code>, <code>0x23</code></td></tr>
+            <tr><td>Lift</td><td>Damiao DM4310 + ESP32 optical limits</td><td><code>0x24</code></td></tr>
+            <tr><td>Vision</td><td>C930e, C920, ARKMICRO</td><td>Right wrist, left wrist, overhead</td></tr>
+          </tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>Parameter</th><th>Released value</th><th>Scope</th></tr></thead><tbody>
+            <tr><td>Wheel radius</td><td><code>0.05 m</code></td><td>Software kinematics</td></tr>
+            <tr><td>Base radius</td><td><code>0.125 m</code></td><td>Center-to-wheel</td></tr>
+            <tr><td>Wheel speed cap</td><td><code>100 RPM</code></td><td>Command safety cap</td></tr>
+            <tr><td>Lift homing</td><td><code>-1</code>, step <code>2 deg</code>, <code>kp=8</code>, <code>kd=0.3</code></td><td>Automatic homing disabled by default</td></tr>
+            <tr><td>Lift thresholds</td><td><code>30 / 90 deg</code></td><td>Base/lift coordination</td></tr>
+            <tr><td>Fast base threshold</td><td><code>0.2 m/s</code></td><td>Blocks upward lift target</td></tr>
+          </tbody></table></div>
+          <div class="callout danger"><strong>Physical authority comes first.</strong><p>One qualified operator must own a tested emergency stop or power disconnect. Clear and support the swept volume before any tool that can enable follower torque.</p></div>
+        </section>
+
+        <section class="section" id="install">
+          <div class="section-head"><span class="section-index">03</span><div><h2>Install the lower-host package</h2></div></div>
+          <p>Use the LeRobot revision validated for the platform. The release does not claim compatibility with every upstream revision.</p>
+          <div class="code-block"><div class="code-toolbar"><span>Lower-host installation</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>cd /path/to/lerobot
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install -e .
+python -m pip install pyserial opencv-python scservo-sdk
+
+cp -a /path/to/KinRT/hardware/diyrobot/lower_host &#92;
+  src/lerobot/robots/diyrobot
+
+python -m pip install -e &#92;
+  /path/to/KinRT/policy/pi05/packages/openpi-client
+
+python -c "from lerobot.robots.diyrobot import DIYRobot; print(DIYRobot.name)"</code></pre></div>
+          <div class="callout success"><strong>Software-only gate</strong><p>Run <code>OFFLINE_SELF_TEST=1 ./start_diyrobot_pi05_policy_client.sh</code>. It must report 14 motors and action shape <code>(1, 14)</code> without opening cameras or actuator buses.</p></div>
+        </section>
+
+        <section class="section" id="devices">
+          <div class="section-head"><span class="section-index">04</span><div><h2>Map devices by identity</h2></div></div>
+          <p>The release omits the original serial numbers and USB topology. Create target-specific udev rules that map verified devices to these semantic paths:</p>
+          <div class="table-wrap"><table><thead><tr><th>Path</th><th>Physical role</th></tr></thead><tbody>
+            <tr><td><code>/dev/diyrobot/leader</code></td><td>Feetech leader bus</td></tr>
+            <tr><td><code>/dev/diyrobot/follower-left</code></td><td>Left RobStride bus</td></tr>
+            <tr><td><code>/dev/diyrobot/follower-right</code></td><td>Right RobStride bus</td></tr>
+            <tr><td><code>/dev/diyrobot/chassis</code></td><td>Damiao chassis/lift bus</td></tr>
+            <tr><td><code>/dev/diyrobot/lift-limits</code></td><td>ESP32 optical-limit reader</td></tr>
+            <tr><td><code>/dev/diyrobot/camera-*</code></td><td>Right wrist, left wrist, overhead</td></tr>
+          </tbody></table></div>
+          <div class="code-block"><div class="code-toolbar"><span>Read-only discovery</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>ls -l /dev/serial/by-id /dev/serial/by-path
+ls -l /dev/v4l/by-id /dev/v4l/by-path
+lsusb
+udevadm info --query=property --name=/dev/ttyUSB0
+udevadm info --query=property --name=/dev/video0</code></pre></div>
+          <p>Confirm each physical role without trial motion. The active strict path uses separate left and right follower buses; the generic class also retains a single-bus compatibility mode. Do not mix their calibration or port model.</p>
+        </section>
+
+        <section class="section" id="calibration">
+          <div class="section-head"><span class="section-index">05</span><div><h2>Calibrate and zero one joint at a time</h2></div></div>
+          <p>Generate all calibration files on the target robot. The tools do not issue pose targets, but follower sampling may briefly enable and disable the selected RobStride motor.</p>
+          <div class="code-block"><div class="code-toolbar"><span>One-side rest and range</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>cd /path/to/lerobot/src/lerobot/robots/diyrobot
+
+python diyrobot_rest_range_calibrate.py rest &#92;
+  --device both --side left
+python diyrobot_rest_range_calibrate.py range &#92;
+  --device follower --side left --duration 20
+python diyrobot_rest_range_calibrate.py show &#92;
+  --device both --side left</code></pre></div>
+          <p>Move joints by hand only through a conservative working range; do not use mechanical stops as limits. Repeat for the right side, record direction/scale evidence, and physically validate each joint before marking it validated.</p>
+          <div class="table-wrap"><table><thead><tr><th>Required evidence per joint</th><th>Acceptance rule</th></tr></thead><tbody>
+            <tr><td>Leader/follower identity</td><td>Name, side, ID, and bus agree</td></tr>
+            <tr><td>Rest and range</td><td>Rest lies inside a conservative absolute range</td></tr>
+            <tr><td>Direction and scale</td><td>Base, positive, and negative samples agree</td></tr>
+            <tr><td>Physical validation</td><td>Tiny supervised test completed without drift or mismatch</td></tr>
+            <tr><td>Record</td><td>Robot ID, operator, time, and file digests stored</td></tr>
+          </tbody></table></div>
+          <p>The complete commands, file schemas, lift-zero procedure, and recalibration triggers are in the <a href="https://github.com/gleeacast/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA/blob/main/hardware/diyrobot/CALIBRATION.md">calibration guide</a>.</p>
+        </section>
+
+        <section class="section" id="cameras">
+          <div class="section-head"><span class="section-index">06</span><div><h2>Align all three cameras to the checkpoint contract</h2></div></div>
+          <div class="table-wrap"><table><thead><tr><th>View</th><th>Collection key</th><th>Policy key</th><th>Format</th></tr></thead><tbody>
+            <tr><td>Overhead</td><td><code>overhead</code></td><td><code>cam_high</code></td><td>640 x 480 @ 30</td></tr>
+            <tr><td>Left wrist</td><td><code>left_gripper</code></td><td><code>cam_left_wrist</code></td><td>640 x 480 @ 30</td></tr>
+            <tr><td>Right wrist</td><td><code>right_gripper</code></td><td><code>cam_right_wrist</code></td><td>640 x 480 @ 30</td></tr>
+          </tbody></table></div>
+          <p>The current code does not rectify images or apply a homography. Its browser overlay uses the overhead rectangle <code>(128,151)</code> to <code>(458,416)</code> at 640 x 480. The saved overlay JSON is not consumed by recording or policy inference.</p>
+          <div class="callout warning"><strong>Camera height is not enough.</strong><p>Checkpoint-compatible reproduction also depends on pitch, roll, yaw, field of view, task-mat pose, exposure, and semantic camera mapping. Physically align the task mat to all four pixel corners.</p></div>
+          <div class="code-block"><div class="code-toolbar"><span>Preview only</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>./start_diyrobot_three_camera_webui.sh
+# Stop the preview before collection or policy inference.</code></pre></div>
+          <p>The task-mat dimensions and printable reference are pending. See the <a href="https://github.com/gleeacast/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA/blob/main/hardware/diyrobot/CAMERA_ALIGNMENT.md">camera-alignment guide</a> for normalized corners, acceptance checks, and the future homography release contract.</p>
         </section>
 
         <section class="section" id="collect">
-          <div class="section-head"><span class="section-index">03</span><div><h2>Collect a one-episode smoke dataset</h2></div></div>
-          <p>Complete the hardware and calibration gates on the real-robot page first. Discover current device paths rather than copying the example paths from another machine.</p>
-          <div class="code-block"><div class="code-toolbar"><span>Device discovery and one episode</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>cd /path/to/lerobot/src/lerobot/robots/hi_arm
-ls -l /dev/serial/by-path
-ls -l /dev/v4l/by-id
-
-TASK="Put the pill box into the center of the notebook." \
-REPO_ID="local/hiarm_smoke" \
-ROOT="/data/hiarm_smoke" \
-EPISODES=1 EPISODE_TIME=20 RESET_TIME=0 FPS=20 \
-./start_hiarm_pi05_record.sh</code></pre></div>
-          <p>The launcher stops the three-camera preview process before recording so that the recorder can acquire all cameras. Verify that no unrelated process owns those devices before stopping anything manually.</p>
-          <h3>Manual episode control</h3>
-          <p>For supervised demonstrations with human-controlled start/stop, use the manual launcher. <code>SPACE</code> starts an episode and <code>ENTER</code> stops and saves it.</p>
-          <div class="code-block"><div class="code-toolbar"><span>Append the exact same task</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>TASK="Put the pill box into the center of the notebook." \
-TASK_MODE=same RESUME=1 \
-REPO_ID="local/hiarm_five_tasks" \
-ROOT="/data/hiarm_five_tasks" \
-./start_hiarm_pi05_record_manual.sh</code></pre></div>
-          <div class="callout danger"><strong>Never bypass preflight to save time.</strong><p>A rejected startup pose is a calibration or physical setup problem. Do not resolve it by widening thresholds until the cause is understood.</p></div>
-        </section>
-
-        <section class="section" id="inspect">
-          <div class="section-head"><span class="section-index">04</span><div><h2>Inspect every dataset layer</h2></div></div>
-          <p>A successful recorder exit is necessary but not sufficient. Verify metadata, parquet rows, images, prompt assignment, joint order, units, and episode outcomes.</p>
-          <div class="code-block"><div class="code-toolbar"><span>Expected v2.1 layout</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>meta/info.json
-meta/tasks.jsonl
-meta/episodes.jsonl
-meta/episodes_stats.jsonl
-data/chunk-000/episode_000000.parquet
-videos/chunk-000/observation.images.right_gripper/episode_000000.mp4
-videos/chunk-000/observation.images.left_gripper/episode_000000.mp4
-videos/chunk-000/observation.images.overhead/episode_000000.mp4</code></pre></div>
+          <div class="section-head"><span class="section-index">07</span><div><h2>Collect and inspect a smoke episode</h2></div></div>
+          <div class="code-block"><div class="code-toolbar"><span>One bounded episode</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>TASK="Put the pill box into the center of the notebook." &#92;
+REPO_ID="local/diyrobot_smoke" ROOT="/data/diyrobot/smoke" &#92;
+EPISODES=1 EPISODE_TIME=20 RESET_TIME=0 FPS=20 &#92;
+./start_diyrobot_pi05_record.sh</code></pre></div>
+          <p>Each frame must contain finite 14-D <code>observation.state</code>, the 14-D target actually sent as <code>action</code>, three RGB views, and exact task text. Strict-teleop JSONL is diagnostic data, not training data.</p>
           <div class="checklist">
-            <div class="check-item"><strong>Metadata</strong><p>Episode, frame, task, feature, and video counts agree.</p></div>
-            <div class="check-item"><strong>Images</strong><p>All three streams open, are synchronized, and show the intended views.</p></div>
-            <div class="check-item"><strong>State/action</strong><p>Both are finite 14-D vectors in the fixed order and degree convention.</p></div>
-            <div class="check-item"><strong>Outcome</strong><p>Failed demonstrations are excluded from a success-only protocol.</p></div>
+            <div class="check-item"><strong>Metadata</strong><p>Episode, task, frame, parquet, and video counts agree.</p></div>
+            <div class="check-item"><strong>Images</strong><p>Three streams are current, correctly named, upright, and synchronized.</p></div>
+            <div class="check-item"><strong>Motion</strong><p>State/action order and degree units match the 14-D contract.</p></div>
+            <div class="check-item"><strong>Outcome</strong><p>Failed demonstrations remain outside a success-only training set.</p></div>
           </div>
-          <p>Transfer the complete directory with <code>meta/</code>, <code>data/</code>, and <code>videos/</code> unchanged. Record a dataset checksum or immutable snapshot identifier before label generation.</p>
         </section>
 
         <section class="section" id="train">
-          <div class="section-head"><span class="section-index">05</span><div><h2>Generate labels and train a paper config</h2></div></div>
-          <p>The unified registry retains the exact DIYRobot OpenPI configurations for PI0.5, PI0, FULL, LoRA, and AdaMoE runs. Select one config name from the same workspace.</p>
-          <div class="code-block"><div class="code-toolbar"><span>DIYRobot KinRT-LoRA</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>cd /path/to/KinRT/policy/pi05
+          <div class="section-head"><span class="section-index">08</span><div><h2>Generate KinRT labels and train</h2></div></div>
+          <p>Freeze the dataset digest before label generation. FULL and LoRA are optimization regimes of the same KinRT method.</p>
+          <div class="code-block"><div class="code-toolbar"><span>Labels and training</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>cd /path/to/KinRT/policy/pi05
 
-uv run python scripts/generate_router_labels.py \
-  --repo-root /data/lerobot/hiarm_five_tasks \
-  --output-dir /data/lerobot/hiarm_five_tasks/meta/router_labels_k4 \
-  --action-horizon 50 --feature-mode chunk_velocity \
+uv run python scripts/generate_router_labels.py &#92;
+  --repo-root /data/diyrobot/five_tasks &#92;
+  --output-dir /data/diyrobot/five_tasks/meta/router_labels_k4 &#92;
+  --action-horizon 50 --feature-mode chunk_velocity &#92;
   --pca-components 64 --num-clusters 4 --seed 0
 
-uv run python scripts/compute_norm_stats.py \
-  --config-name kinrt_lora_diyrobot
-
-uv run python scripts/train.py kinrt_lora_diyrobot \
-  --exp-name diyrobot_kinrt_lora</code></pre></div>
-          <p>For FULL, use <code>kinrt_full_diyrobot</code>. The retained paper configs use 8,000 steps, batch size 32, action horizon 50, four experts, Top-1 routing, and disabled EMA. The active label path and dataset identity must be replaced with local values.</p>
+uv run python scripts/compute_norm_stats.py &#92;
+  --config-name kinrt_full_diyrobot
+uv run python scripts/train.py kinrt_full_diyrobot &#92;
+  --exp-name diyrobot_kinrt_full</code></pre></div>
+          <p>Use <code>kinrt_lora_diyrobot</code> for LoRA. Keep the selected name identical across normalization, training, checkpoint serving, and reporting. The reported DIYRobot runs use 8,000 steps and effective batch size 32.</p>
         </section>
 
-        <section class="section" id="serve">
-          <div class="section-head"><span class="section-index">06</span><div><h2>Serve the checkpoint and validate the contract</h2></div></div>
-          <p>Serve the exact checkpoint with the same config and normalization assets. The lower host remains the only process that owns cameras and motor buses.</p>
-          <div class="code-block"><div class="code-toolbar"><span>OpenPI server outline</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>cd /path/to/KinRT/policy/pi05
-uv run python scripts/serve_policy.py policy:checkpoint \
-  --policy.config=kinrt_lora_diyrobot \
-  --policy.dir=/checkpoints/kinrt_lora_diyrobot/diyrobot_kinrt_lora/8000</code></pre></div>
-          <p>The policy request must carry a 14-D state, three images, and a prompt. The response must contain a 14-D action or an action chunk with final dimension 14. The current lower-host launcher maps the live camera names <code>cam_high</code>, <code>cam_left_wrist</code>, and <code>cam_right_wrist</code> to the server's <code>images.*</code> keys.</p>
+        <section class="section" id="deploy">
+          <div class="section-head"><span class="section-index">09</span><div><h2>Deploy through guarded stages</h2></div></div>
+          <div class="flow">
+            <div class="flow-step"><span>GATE A</span><strong>Offline self-test</strong><p>No cameras or actuator buses.</p></div>
+            <div class="flow-step"><span>GATE B</span><strong>Dry policy</strong><p>Cameras and feedback, no target commands.</p></div>
+            <div class="flow-step"><span>GATE C</span><strong>Bounded motion</strong><p>One chunk step and short duration.</p></div>
+            <div class="flow-step"><span>GATE D</span><strong>Benchmark</strong><p>Fixed checkpoint and physical protocol.</p></div>
+          </div>
+          <div class="code-block"><div class="code-toolbar"><span>Dry then bounded</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>POLICY_SERVER="&lt;gpu-host&gt;:&lt;port&gt;" TASK_ID=0 &#92;
+  ./start_diyrobot_pi05_policy_client.sh
+
+POLICY_SERVER="&lt;gpu-host&gt;:&lt;port&gt;" TASK_ID=0 &#92;
+ALLOW_MOTION=1 DURATION=30 ACTION_CHUNK_STEPS=1 &#92;
+  ./start_diyrobot_pi05_policy_client.sh</code></pre></div>
+          <p>Stop immediately on startup mismatch, unexpected direction, drift, stale feedback, camera failure, policy timeout, invalid action shape, or collision risk. Software cleanup is not a substitute for the physical stop.</p>
         </section>
 
-        <section class="section" id="evaluate">
-          <div class="section-head"><span class="section-index">07</span><div><h2>Evaluate with three gates</h2></div></div>
-          <h3>Gate A: software only</h3>
-          <div class="code-block"><div class="code-toolbar"><span>No cameras or buses</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>OFFLINE_SELF_TEST=1 ./start_hiarm_pi05_policy_client.sh</code></pre></div>
-          <h3>Gate B: dry policy</h3>
-          <div class="code-block"><div class="code-toolbar"><span>Inference and clamp, no motor command</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>POLICY_SERVER="&lt;gpu-host&gt;:&lt;port&gt;" TASK_ID=0 \
-  ./start_hiarm_pi05_policy_client.sh</code></pre></div>
-          <h3>Gate C: bounded motion</h3>
-          <div class="code-block"><div class="code-toolbar"><span>Qualified operator and emergency stop required</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>POLICY_SERVER="&lt;gpu-host&gt;:&lt;port&gt;" TASK_ID=0 \
-  ALLOW_MOTION=1 DURATION=30 \
-  ./start_hiarm_pi05_policy_client.sh</code></pre></div>
-          <p>After all five tasks pass bounded trials, run 50 trials per task with a fixed checkpoint, canonical prompt, reset protocol, object layout, success criterion, and failure log. Do not enable unbounded motion for benchmark collection.</p>
+        <section class="section" id="report">
+          <div class="section-head"><span class="section-index">10</span><div><h2>Report standard and OOD trials separately</h2></div></div>
+          <p>Evaluate the five prompt-v3 tasks with 50 standard trials each. Record task, prompt variant, checkpoint, calibration digests, camera reference, operator, outcome, and stop reason for every trial.</p>
+          <figure class="figure"><img src="assets/images/posters/diyrobot-06_ood_place_pill_box_old_scene.jpg" alt="DIYRobot task under altered illumination" /><figcaption>The additional 100 altered-lighting trials are OOD scenes and remain separate from the standard aggregate.</figcaption></figure>
+          <div class="callout"><strong>Publication boundary</strong><p>The source and protocol are released; physical execution was not rerun during this audit. Numeric equivalence still depends on checkpoints, target-specific calibration, and the pending mechanical/camera geometry release.</p></div>
         </section>
 
-        <section class="section" id="configs">
-          <div class="section-head"><span class="section-index">08</span><div><h2>Use only confirmed OpenPI paper configs</h2></div></div>
-          <div class="table-wrap"><table><thead><tr><th>Paper row</th><th>Release config</th><th>Parameterization</th></tr></thead><tbody>
-            <tr><td>pi0.5-Full</td><td><code>pi05_full_diyrobot</code></td><td>Dense baseline</td></tr>
-            <tr><td>pi0.5-LoRA</td><td><code>pi05_lora_diyrobot</code></td><td>LoRA baseline</td></tr>
-            <tr><td>pi0-Full</td><td><code>pi0_full_diyrobot</code></td><td>Dense baseline</td></tr>
-            <tr><td>pi0-LoRA</td><td><code>pi0_lora_diyrobot</code></td><td>LoRA baseline</td></tr>
-            <tr><td>KinRT-Full</td><td><code>kinrt_full_diyrobot</code></td><td>KinRT, dense</td></tr>
-            <tr><td>KinRT-LoRA</td><td><code>kinrt_lora_diyrobot</code></td><td>KinRT, LoRA</td></tr>
-            <tr><td>KinRT-Full (pi0)</td><td><code>kinrt_full_pi0_diyrobot</code></td><td>KinRT, PI0 dense</td></tr>
-            <tr><td>KinRT-LoRA (pi0)</td><td><code>kinrt_lora_pi0_diyrobot</code></td><td>KinRT, PI0 LoRA</td></tr>
-            <tr><td>KinRT-AdaMoE</td><td><code>kinrt_adamoe_diyrobot</code></td><td>KinRT supervision on AdaMoE</td></tr>
-          </tbody></table></div>
-          <p>OpenVLA, RDT-1B, Hi-MoE, AdaMoE, and KinRT-OpenVLA use external frameworks. Their evidence is retained in the reference page; they are not valid OpenPI <code>TrainConfig</code> names.</p>
-        </section>
-        <nav class="next-prev" aria-label="Adjacent pages"><a href="robotwin.html"><span>Previous</span><strong>RoboTwin reproduction</strong></a><a href="real-robot.html"><span>Next</span><strong>HiArm setup and safety</strong></a></nav>
+        <nav class="next-prev" aria-label="Adjacent pages"><a href="robotwin.html"><span>Previous</span><strong>RoboTwin reproduction</strong></a><a href="reference.html"><span>Next</span><strong>Configs and troubleshooting</strong></a></nav>
       </main>
     </div>
-    <footer class="site-footer"><div class="footer-inner"><span>KinRT reproducibility documentation</span><nav class="footer-links" aria-label="Footer"><a href="../README.md">README</a><a href="real-robot.html">Hardware guide</a><a href="reference.html#configs">Config registry</a></nav></div></footer>
+    <footer class="site-footer"><div class="footer-inner"><span>KinRT reproducibility documentation</span><nav class="footer-links" aria-label="Footer"><a href="https://github.com/gleeacast/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA/tree/main/hardware/diyrobot">DIYRobot source</a><a href="reference.html#configs">Config registry</a><a href="index.html">Project page</a></nav></div></footer>
   </body>
 </html>

@@ -5,16 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="KinRT method, routing objective, implementation path, and FULL versus LoRA parameterization." />
     <title>Method | KinRT</title>
-    <link rel="stylesheet" href="styles.css?v=20260818-4" />
+    <link rel="stylesheet" href="styles.css?v=20260819-1" />
     <script src="app.js?v=20260818-2" defer></script>
   </head>
   <body data-page="method">
     <a class="skip-link" href="#main">Skip to content</a>
-    <header class="site-header"><div class="header-inner"><a class="brand" href="index.html"><span class="brand-mark">KR</span>KinRT</a><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="primary-nav">Menu</button><nav class="primary-nav" id="primary-nav" data-primary-nav aria-label="Primary navigation"><a href="getting-started.html" data-page-link="start">Start</a><a href="method.html" data-page-link="method">Method</a><a href="robotwin.html" data-page-link="robotwin">RoboTwin</a><a href="diyrobot.html" data-page-link="diyrobot">DIYRobot</a><a href="real-robot.html" data-page-link="hardware">Real robot</a><a href="reference.html" data-page-link="reference">Reference</a></nav></div></header>
+    <header class="site-header"><div class="header-inner"><a class="brand" href="index.html"><span class="brand-mark">KR</span>KinRT</a><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="primary-nav">Menu</button><nav class="primary-nav" id="primary-nav" data-primary-nav aria-label="Primary navigation"><a href="getting-started.html" data-page-link="start">Start</a><a href="method.html" data-page-link="method">Method</a><a href="robotwin.html" data-page-link="robotwin">RoboTwin</a><a href="diyrobot.html" data-page-link="diyrobot">DIYRobot</a><a href="reference.html" data-page-link="reference">Reference</a></nav></div></header>
     <div class="release-strip"><div class="release-strip-inner"><span><span class="status-dot"></span><strong>Terminology</strong> KinRT is the method</span><span><strong>FULL / LoRA</strong> parameterization only</span><span><strong>Inference</strong> observation-only</span></div></div>
     <div class="page docs-shell">
       <aside class="sidebar" aria-label="Documentation navigation">
-        <p class="sidebar-label">Reproduce</p><nav><a href="getting-started.html" data-page-link="start">Getting started</a><a href="method.html" data-page-link="method">Method</a><a href="robotwin.html" data-page-link="robotwin">RoboTwin</a><a href="diyrobot.html" data-page-link="diyrobot">DIYRobot</a><a href="real-robot.html" data-page-link="hardware">Real robot</a><a href="reference.html" data-page-link="reference">Reference</a></nav>
+        <p class="sidebar-label">Reproduce</p><nav><a href="getting-started.html" data-page-link="start">Getting started</a><a href="method.html" data-page-link="method">Method</a><a href="robotwin.html" data-page-link="robotwin">RoboTwin</a><a href="diyrobot.html" data-page-link="diyrobot">DIYRobot</a><a href="reference.html" data-page-link="reference">Reference</a></nav>
         <div class="sidebar-divider"></div><p class="sidebar-label">On this page</p><nav><a href="#definition">Definition</a><a href="#labels">Offline labels</a><a href="#router">Router and experts</a><a href="#loss">Training objective</a><a href="#variants">FULL and LoRA</a><a href="#implementation">Code path</a><a href="#interpretation">Interpretation limits</a></nav>
       </aside>
       <main class="doc-main" id="main">

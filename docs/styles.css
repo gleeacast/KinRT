@@ -256,6 +256,11 @@ code, pre { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospac
   border-radius: 3px;
   font-size: 0.91em;
 }
+.doc-main p code,
+.callout code {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
 
 .callout {
   margin: 22px 0;
@@ -755,7 +760,7 @@ tbody tr:hover td { background: #f8fafb; }
   padding-left: 22px;
   border-left: 1px solid var(--line);
 }
-.reproduce-links a:nth-last-child(-n+3) { border-bottom: 0; }
+.reproduce-links a:nth-last-child(-n+2) { border-bottom: 0; }
 .reproduce-links span { color: var(--blue); font-size: 12px; font-weight: 800; }
 .reproduce-links strong { display: block; margin-top: 8px; font-size: 18px; }
 .reproduce-links small { display: block; margin-top: 5px; color: var(--muted); font-size: 14px; }
@@ -819,8 +824,8 @@ tbody tr:hover td { background: #f8fafb; }
   .reproduce-links a:nth-child(3n+2),
   .reproduce-links a:nth-child(3n+3) { padding-left: 0; border-left: 0; }
   .reproduce-links a:nth-child(even) { padding-left: 22px; border-left: 1px solid var(--line); }
-  .reproduce-links a:nth-last-child(-n+3) { border-bottom: 1px solid var(--line); }
   .reproduce-links a:nth-last-child(-n+2) { border-bottom: 0; }
+  .reproduce-links a:nth-last-child(2) { border-bottom: 1px solid var(--line); }
 }
 
 @media (max-width: 580px) {

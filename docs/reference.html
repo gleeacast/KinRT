@@ -5,16 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="KinRT configuration matrix, artifact checklist, commands, audit scope, and troubleshooting." />
     <title>Reference | KinRT</title>
-    <link rel="stylesheet" href="styles.css?v=20260818-4" />
+    <link rel="stylesheet" href="styles.css?v=20260819-1" />
     <script src="app.js?v=20260818-2" defer></script>
   </head>
   <body data-page="reference">
     <a class="skip-link" href="#main">Skip to content</a>
-    <header class="site-header"><div class="header-inner"><a class="brand" href="index.html"><span class="brand-mark">KR</span>KinRT</a><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="primary-nav">Menu</button><nav class="primary-nav" id="primary-nav" data-primary-nav aria-label="Primary navigation"><a href="getting-started.html" data-page-link="start">Start</a><a href="method.html" data-page-link="method">Method</a><a href="robotwin.html" data-page-link="robotwin">RoboTwin</a><a href="diyrobot.html" data-page-link="diyrobot">DIYRobot</a><a href="real-robot.html" data-page-link="hardware">Real robot</a><a href="reference.html" data-page-link="reference">Reference</a></nav></div></header>
+    <header class="site-header"><div class="header-inner"><a class="brand" href="index.html"><span class="brand-mark">KR</span>KinRT</a><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="primary-nav">Menu</button><nav class="primary-nav" id="primary-nav" data-primary-nav aria-label="Primary navigation"><a href="getting-started.html" data-page-link="start">Start</a><a href="method.html" data-page-link="method">Method</a><a href="robotwin.html" data-page-link="robotwin">RoboTwin</a><a href="diyrobot.html" data-page-link="diyrobot">DIYRobot</a><a href="reference.html" data-page-link="reference">Reference</a></nav></div></header>
     <div class="release-strip"><div class="release-strip-inner"><span><span class="status-dot"></span><strong>Paper rows</strong> 14 identified</span><span><strong>Native OpenPI configs</strong> 9 confirmed</span><span><strong>External frameworks</strong> 5 identified</span></div></div>
     <div class="page docs-shell">
       <aside class="sidebar" aria-label="Documentation navigation">
-        <p class="sidebar-label">Reproduce</p><nav><a href="getting-started.html" data-page-link="start">Getting started</a><a href="method.html" data-page-link="method">Method</a><a href="robotwin.html" data-page-link="robotwin">RoboTwin</a><a href="diyrobot.html" data-page-link="diyrobot">DIYRobot</a><a href="real-robot.html" data-page-link="hardware">Real robot</a><a href="reference.html" data-page-link="reference">Reference</a></nav>
+        <p class="sidebar-label">Reproduce</p><nav><a href="getting-started.html" data-page-link="start">Getting started</a><a href="method.html" data-page-link="method">Method</a><a href="robotwin.html" data-page-link="robotwin">RoboTwin</a><a href="diyrobot.html" data-page-link="diyrobot">DIYRobot</a><a href="reference.html" data-page-link="reference">Reference</a></nav>
         <div class="sidebar-divider"></div><p class="sidebar-label">On this page</p><nav><a href="#configs">Config registry</a><a href="#artifacts">Artifacts</a><a href="#commands">Commands</a><a href="#evaluation">Evaluation contract</a><a href="#troubleshooting">Troubleshooting</a><a href="#audit">Audit boundary</a></nav>
       </aside>
       <main class="doc-main" id="main">
@@ -72,8 +72,8 @@
             <tr><td>Train</td><td><code>uv run python scripts/train.py CONFIG --exp-name NAME</code></td></tr>
             <tr><td>RoboTwin server</td><td><code>bash serve_remote_model.sh deploy_policy.yml</code></td></tr>
             <tr><td>RoboTwin remote client</td><td><code>MODEL_SERVER_HOST=... bash eval_remote.sh TASK GPU</code></td></tr>
-            <tr><td>HiArm offline test</td><td><code>OFFLINE_SELF_TEST=1 ./start_hiarm_pi05_policy_client.sh</code></td></tr>
-            <tr><td>HiArm dry policy</td><td><code>POLICY_SERVER=... TASK_ID=0 ./start_hiarm_pi05_policy_client.sh</code></td></tr>
+            <tr><td>DIYRobot offline test</td><td><code>OFFLINE_SELF_TEST=1 ./start_diyrobot_pi05_policy_client.sh</code></td></tr>
+            <tr><td>DIYRobot dry policy</td><td><code>POLICY_SERVER=... TASK_ID=0 ./start_diyrobot_pi05_policy_client.sh</code></td></tr>
             <tr><td>Release validation</td><td><code>python tools/validate_release.py --check-manifests</code></td></tr>
             <tr><td>Local website</td><td><code>python -m http.server 8080 --directory docs</code></td></tr>
           </tbody></table></div>
@@ -100,7 +100,7 @@
             <tr><td>Checkpoint restore shape mismatch</td><td>Backbone or FULL/LoRA mismatch</td><td>Verify config name, model family, ranks, and checkpoint source.</td></tr>
             <tr><td>RoboTwin task module missing</td><td>Incomplete simulator checkout</td><td>Restore the compatible <code>envs/</code> and task assets.</td></tr>
             <tr><td>Evaluation returns fewer trials</td><td>Partial run or transport loss</td><td>Count result records, inspect errors, and resume with explicit seed accounting.</td></tr>
-            <tr><td>HiArm startup mismatch</td><td>Pose/calibration</td><td>Stop before motion; restore the pose or recalibrate the affected joint.</td></tr>
+            <tr><td>DIYRobot startup mismatch</td><td>Pose/calibration</td><td>Stop before motion; restore the pose or recalibrate the affected joint.</td></tr>
             <tr><td>Missing follower feedback</td><td>USB-CAN/wiring</td><td>Disable torque, inspect the relevant bus, and repeat passive checks.</td></tr>
             <tr><td>Camera open or wrong image</td><td>Device contention/mapping</td><td>Stop preview processes and verify by-id paths and semantic views.</td></tr>
             <tr><td>Policy response stale</td><td>Network/server latency</td><td>Stop motion, inspect server load and transport, then repeat the dry gate.</td></tr>
@@ -111,17 +111,17 @@
           <div class="section-head"><span class="section-index">06</span><div><h2>Audit boundary and unresolved items</h2></div></div>
           <ul>
             <li>The KinRT sources and configuration mappings were statically audited and validated; full training was not rerun in this documentation build.</li>
-            <li>The HiArm source was inspected remotely with read-only commands. No remote file was edited and no hardware process was started.</li>
+            <li>The DIYRobot source was inspected remotely with read-only commands. No remote file was edited and no hardware process was started.</li>
             <li>No real-robot calibration, camera stream, bus feedback, torque enable, collection, or motion was executed by this audit.</li>
             <li>The complete RoboTwin simulator and large artifacts are external, so end-to-end numeric reproduction remains dependent on their release.</li>
             <li>The paper label “Pull Bottle” conflicts with the active prompt-v3 pill-box pulling task and must be resolved before publication.</li>
-            <li>Historical HiArm documents contain stale port mappings and older camera names; this website uses the current active launchers and requires device discovery.</li>
+            <li>Historical source-host documents contain stale port mappings and older camera names; this website uses the released DIYRobot copy and requires device discovery.</li>
           </ul>
           <div class="callout warning"><strong>Publication rule</strong><p>Do not describe an external artifact or an unexecuted hardware test as included, verified, or reproduced. State the exact boundary in the release notes.</p></div>
         </section>
-        <nav class="next-prev" aria-label="Adjacent pages"><a href="real-robot.html"><span>Previous</span><strong>Real robot</strong></a><a href="index.html"><span>Return</span><strong>Reproduction hub</strong></a></nav>
+        <nav class="next-prev" aria-label="Adjacent pages"><a href="diyrobot.html"><span>Previous</span><strong>DIYRobot</strong></a><a href="index.html"><span>Return</span><strong>Reproduction hub</strong></a></nav>
       </main>
     </div>
-    <footer class="site-footer"><div class="footer-inner"><span>KinRT reproducibility documentation</span><nav class="footer-links" aria-label="Footer"><a href="PAPER_MODEL_CONFIG_MAP.md">Model mapping</a><a href="../CHANGELOG_AND_SOURCE_MANIFEST.md">Change record</a><a href="../REAL_ROBOT_AUDIT.md">Hardware audit</a></nav></div></footer>
+    <footer class="site-footer"><div class="footer-inner"><span>KinRT reproducibility documentation</span><nav class="footer-links" aria-label="Footer"><a href="PAPER_MODEL_CONFIG_MAP.md">Model mapping</a><a href="https://github.com/gleeacast/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA/blob/main/CHANGELOG_AND_SOURCE_MANIFEST.md">Change record</a><a href="https://github.com/gleeacast/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA/blob/main/DIYROBOT_SOURCE_AUDIT.md">DIYRobot audit</a></nav></div></footer>
   </body>
 </html>

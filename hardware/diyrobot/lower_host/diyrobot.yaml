@@ -1,0 +1,63 @@
+# DIYRobot configuration example
+# -------------------------------------------------------
+# Hardware:
+#   Leader arms  : 14x Feetech STS3215 (USB-serial)
+#   Follower arms: 14x RobStride joint motors (USB-CAN #1)
+#   Chassis      : 3x Damiao wheel motors + 1x Damiao lift (USB-CAN #2)
+#   Lift limits  : ESP32 + U-shaped opto sensors (serial)
+#
+# Adjust the port values to match your system.
+# -------------------------------------------------------
+
+robot:
+  _type: diyrobot
+
+  # --- Port assignments ---
+  leader_port: "/dev/diyrobot/leader"  # Feetech servo bus
+  follower_port: "/dev/diyrobot/follower"  # RobStride CH340 USB-CAN AT transport
+  chassis_port: "/dev/diyrobot/chassis"  # Damiao USB-CAN for chassis and lift
+
+  # --- Lift limit sensor serial ---
+  lift_limit_port: "/dev/diyrobot/lift-limits"  # ESP32 limit sensor
+  lift_limit_baudrate: 115200
+  lift_limit_stale_timeout_s: 1.0
+  stop_lift_on_limit_serial_loss: true
+
+  # --- Lift homing / zeroing ---
+  auto_home_lift_on_connect: false
+  lift_home_direction: -1
+  lift_home_step_deg: 2.0
+  lift_home_kp: 8.0
+  lift_home_kd: 0.3
+  lift_home_settle_s: 0.2
+  lift_zero_pos_deg: 0.0
+
+  # --- Safety ---
+  max_relative_target: null
+  disable_torque_on_disconnect: true
+
+  # --- Normalization ---
+  use_degrees: true
+
+  # --- Chassis kinematics ---
+  wheel_radius: 0.05
+  base_radius: 0.125
+  max_wheel_rpm: 100.0
+  chassis_wheel_kp: 0.0
+  chassis_wheel_kd: 3.0
+  chassis_wheel_torque_ff: 3.0
+  chassis_test_velocity_rad_s: 5.0
+  wheel_direction_signs:
+    wheel_left: 1
+    wheel_back: 1
+    wheel_right: 1
+
+  # --- Base / lift coordination ---
+  lift_low_pos_deg: 30.0
+  lift_high_pos_deg: 90.0
+  lift_mid_speed_scale: 0.6
+  lift_high_speed_scale: 0.3
+  base_fast_speed_mps: 0.2
+
+  # --- Cameras (optional) ---
+  cameras: {}

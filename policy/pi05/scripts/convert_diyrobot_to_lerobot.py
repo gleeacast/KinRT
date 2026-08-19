@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Convert HiArm real robot data (JSONL + JPG) to LeRobot Parquet format
+Convert DIYRobot data (JSONL + JPG) to LeRobot Parquet format
 compatible with pi05_aloha_full_base fine-tuning.
 
 Data layout expected:
@@ -27,8 +27,8 @@ Output layout:
         ...
 
 Usage:
-    python scripts/convert_hiarm_to_lerobot.py \\
-        --input_dir /path/to/hiarm_data_capture/data/task_pick_cube_20260514_220147 \\
+    python scripts/convert_diyrobot_to_lerobot.py \\
+        --input_dir /path/to/diyrobot_data_capture/data/task_pick_cube_20260514_220147 \\
         --output_dir /path/to/output_lerobot_dataset \\
         --task "Pick up the cube and place it in the box." \\
         --gripper_open_deg 100.0
@@ -45,12 +45,10 @@ import numpy as np
 from datasets import Dataset, Features, Image, Sequence, Value
 from PIL import Image as PILImage
 
-# ──────────────────────────────────────────────
 # Constants
-# ──────────────────────────────────────────────
 
-# Joint order in hiarm follower data (14 DOF, both arms)
-HIARM_JOINTS = [
+# Joint order in DIYRobot follower data (14 DOF across both arms).
+DIYROBOT_JOINTS = [
     "left_shoulder_pan",
     "left_shoulder_lift",
     "left_elbow_flex",
@@ -66,18 +64,16 @@ HIARM_JOINTS = [
     "right_wrist_roll",
     "right_gripper",
 ]
-N_JOINTS = len(HIARM_JOINTS)  # 14
+N_JOINTS = len(DIYROBOT_JOINTS)
 
-# Camera mapping:  lerobot key  →  hiarm key (as used in jsonl cam dict and cam_* dirs)
+# Map policy image keys to source JSONL keys and camera directories.
 CAM_MAPPING = {
     "cam_high":        "overhead",
     "cam_left_wrist":  "left_gripper",
     "cam_right_wrist": "right_gripper",
 }
 
-# ──────────────────────────────────────────────
 # Image helpers
-# ──────────────────────────────────────────────
 
 def load_jpg_as_png_bytes(path: Path) -> bytes:
     """Load a JPG file and re-encode as PNG bytes (matching sim parquet format)."""
@@ -87,21 +83,17 @@ def load_jpg_as_png_bytes(path: Path) -> bytes:
     return buf.getvalue()
 
 
-def build_cam_index(episode_dir: Path, frames: list[dict], hiarm_key: str) -> list[Path | None]:
-    """
-    Build a list of image paths aligned to each control frame using forward-fill.
-    hiarm_key: 'gripper' or 'overhead'
-    Returns list of length T where each element is a resolved Path (or None if unavailable).
-    """
-    cam_dir = episode_dir / f"cam_{hiarm_key}"
+def build_cam_index(episode_dir: Path, frames: list[dict], source_camera_key: str) -> list[Path | None]:
+    """Align source camera frames to control frames using forward filling."""
+    cam_dir = episode_dir / f"cam_{source_camera_key}"
     T = len(frames)
     resolved: list[Path | None] = [None] * T
 
     last_path: Path | None = None
     for t, frame in enumerate(frames):
         cam = frame.get("cam", {})
-        if hiarm_key in cam:
-            candidate = cam_dir / cam[hiarm_key]
+        if source_camera_key in cam:
+            candidate = cam_dir / cam[source_camera_key]
             if candidate.exists():
                 last_path = candidate
         resolved[t] = last_path
@@ -141,9 +133,7 @@ def build_image_column(cam_index: list[Path | None], col_name: str) -> list[dict
     return result
 
 
-# ──────────────────────────────────────────────
 # State / action helpers
-# ──────────────────────────────────────────────
 
 def extract_states(frames: list[dict], gripper_open_deg: float) -> np.ndarray:
     """
@@ -156,7 +146,7 @@ def extract_states(frames: list[dict], gripper_open_deg: float) -> np.ndarray:
     states = np.zeros((T, N_JOINTS), dtype=np.float32)
     for t, frame in enumerate(frames):
         follower = frame["follower"]
-        for j, joint in enumerate(HIARM_JOINTS):
+        for j, joint in enumerate(DIYROBOT_JOINTS):
             states[t, j] = follower[joint]["pos_deg"]
     # Convert arm joints to radians (all except the two gripper indices 6 and 13)
     arm_indices = list(range(6)) + list(range(7, 13))
@@ -178,9 +168,7 @@ def build_actions(states: np.ndarray) -> np.ndarray:
     return actions
 
 
-# ──────────────────────────────────────────────
 # Episode processing
-# ──────────────────────────────────────────────
 
 def process_episode(
     episode_dir: Path,
@@ -203,31 +191,29 @@ def process_episode(
                 frames.append(json.loads(line))
     T = len(frames)
 
-    # ── State & action ──
+    # Preserve one 14-D state/action convention across every episode.
     states_14 = extract_states(frames, gripper_open_deg)
     actions_14 = build_actions(states_14)
 
-    # ── Camera images ──
     cam_index = {
-        hiarm_key: build_cam_index(episode_dir, frames, hiarm_key)
-        for hiarm_key in ("left_gripper", "right_gripper", "overhead")
+        source_camera_key: build_cam_index(episode_dir, frames, source_camera_key)
+        for source_camera_key in ("left_gripper", "right_gripper", "overhead")
     }
 
     img_cols = {}
-    for lerobot_key, hiarm_key in CAM_MAPPING.items():
+    for lerobot_key, source_camera_key in CAM_MAPPING.items():
         img_cols[f"observation.images.{lerobot_key}"] = build_image_column(
-            cam_index[hiarm_key], lerobot_key
+            cam_index[source_camera_key], lerobot_key
         )
 
-    # ── Index columns ──
+    # LeRobot requires local, episode, and global frame indices.
     timestamps = (np.arange(T, dtype=np.float32) / fps).reshape(-1)
     frame_indices = np.arange(T, dtype=np.int64)
     episode_indices = np.full(T, episode_index, dtype=np.int64)
     global_indices = np.arange(global_frame_offset, global_frame_offset + T, dtype=np.int64)
     task_indices = np.full(T, task_index, dtype=np.int64)
 
-    # ── Build HF Dataset (required for proper huggingface parquet metadata) ──
-    # HF Image feature accepts {"bytes": bytes, "path": str} directly.
+    # Build through HF Dataset to retain the expected Parquet metadata.
     hf_features = Features({
         "observation.state": Sequence(Value("float32"), length=14),
         "action": Sequence(Value("float32"), length=14),
@@ -255,7 +241,7 @@ def process_episode(
     }
     df = Dataset.from_dict(data_dict, features=hf_features)
 
-    # ── Episode stats ──
+    # Store per-episode statistics in the LeRobot v2.1 schema.
     def feat_stats(arr: np.ndarray, count: int) -> dict:
         return {
             "min": arr.min(axis=0).tolist(),
@@ -295,9 +281,7 @@ def process_episode(
     return df, stats
 
 
-# ──────────────────────────────────────────────
 # Meta file generation
-# ──────────────────────────────────────────────
 
 def write_meta(
     output_dir: Path,
@@ -312,7 +296,7 @@ def write_meta(
     total_episodes = len(episode_lengths)
     total_frames = sum(episode_lengths)
 
-    # ── info.json ──
+    # info.json defines the dataset-level schema and chunk layout.
     info = {
         "codebase_version": "v2.1",
         "robot_type": "aloha",
@@ -369,11 +353,11 @@ def write_meta(
     with open(meta_dir / "info.json", "w") as f:
         json.dump(info, f, indent=4)
 
-    # ── tasks.jsonl ──
+    # Keep a single task index for this conversion invocation.
     with open(meta_dir / "tasks.jsonl", "w") as f:
         f.write(json.dumps({"task_index": 0, "task": task_description}) + "\n")
 
-    # ── episodes.jsonl ──
+    # Record one metadata row for each converted episode.
     with open(meta_dir / "episodes.jsonl", "w") as f:
         for i, length in enumerate(episode_lengths):
             entry = {
@@ -383,15 +367,13 @@ def write_meta(
             }
             f.write(json.dumps(entry) + "\n")
 
-    # ── episodes_stats.jsonl ──
+    # Retain per-episode statistics for downstream normalization checks.
     with open(meta_dir / "episodes_stats.jsonl", "w") as f:
         for stats in episode_stats:
             f.write(json.dumps(stats) + "\n")
 
 
-# ──────────────────────────────────────────────
 # Main
-# ──────────────────────────────────────────────
 
 def discover_episodes(input_dir: Path) -> list[Path]:
     """Return sorted list of episode subdirectories (episode_XXX)."""
@@ -406,11 +388,11 @@ def discover_episodes(input_dir: Path) -> list[Path]:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Convert HiArm JSONL+JPG data to LeRobot Parquet format"
+        description="Convert DIYRobot JSONL+JPG data to LeRobot Parquet format"
     )
     parser.add_argument(
         "--input_dir", type=Path, required=True,
-        help="Task directory, e.g. hiarm_data_capture/data/task_pick_cube_20260514_220147",
+        help="Task directory, e.g. diyrobot_data_capture/data/task_pick_cube_20260514_220147",
     )
     parser.add_argument(
         "--output_dir", type=Path, required=True,
@@ -463,7 +445,7 @@ def main():
     global_frame_offset = 0
 
     for ep_idx, ep_dir in enumerate(episode_dirs):
-        print(f"  Processing {ep_dir.name} → episode_{ep_idx:06d}.parquet ...", end="", flush=True)
+        print(f"  Processing {ep_dir.name} -> episode_{ep_idx:06d}.parquet ...", end="", flush=True)
 
         df, stats = process_episode(
             episode_dir=ep_dir,
@@ -498,7 +480,7 @@ def main():
     print(f"\nDone. {len(episode_dirs)} episodes, {total_frames} total frames.")
     print(f"Dataset written to: {output_dir}")
     print()
-    print("Next step — update config.py:")
+    print("Next step - update config.py:")
     print(f'  repo_id="{output_dir}"')
 
 

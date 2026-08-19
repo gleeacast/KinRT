@@ -27,7 +27,7 @@ It is therefore inaccurate to describe the earlier remote comparison as fully
 read-only or entirely comment-only.
 
 The current consolidation and website pass did not write either RoboTwin host.
-The 2026-08-18 HiArm audit was also strictly read-only: no lower-host file was
+The 2026-08-18 DIYRobot audit of the legacy `hi_arm` path was also strictly read-only: no lower-host file was
 modified and no camera, bus, motor, installation, collection, or policy-motion
 process was started.
 
@@ -94,12 +94,15 @@ kinrt_adamoe_diyrobot
 - `README.md`: replaced split-tree setup, training, and overlay instructions
   with one-workspace commands.
 - `docs/getting-started.html`, `docs/robotwin.html`, `docs/diyrobot.html`, and
-  `docs/real-robot.html`: replaced split-tree paths and explanations.
+  `docs/diyrobot.html`: consolidated hardware, calibration, data, and evaluation.
 - `docs/FULL_VS_LORA.md`, `docs/KINRT_IMPLEMENTATION.md`, and
   `docs/OPEN_SOURCE_NOTES.md`: aligned the technical description with one
   implementation and one config registry.
 - `tools/validate_release.py`: changed exact config checking and manifest
   generation from two variants to one source tree.
+- `policy/pi05/scripts/convert_diyrobot_to_lerobot.py`: renamed the public
+  real-platform data converter and its internal symbols from the legacy
+  platform name without changing the conversion schema.
 - `manifests/KINRT_SOURCE_SHA256.txt`: added a deterministic inventory of all
   files under `policy/` and `script/`.
 
@@ -157,12 +160,26 @@ suffix did not exist in the audited registry.
 - Source paths for external datasets and checkpoints remain placeholders or
   provenance references and must be mapped before execution.
 
-## Real-robot boundary
+## DIYRobot lower-host release
 
-The HiArm source under `src/lerobot/robots/hi_arm` was reviewed remotely and is
-not redistributed or modified by this package. `REAL_ROBOT_AUDIT.md` records
-the active files, joint/camera contracts, safety gates, and observed
-inconsistencies.
+The DIYRobot source under the legacy `src/lerobot/robots/hi_arm` path was
+reviewed remotely without writes and is now redistributed as a sanitized public
+copy under `hardware/diyrobot/lower_host`. `hardware/diyrobot/SOURCE_MANIFEST.md`
+records included files, original hashes, release-copy changes, exclusions,
+compatibility identifiers, and unresolved mechanical artifacts.
+
+Public classes, source filenames, newly generated data IDs, logs, calibration
+outputs, UI text, and documentation use DIYRobot. Source-host names remain only
+in provenance and historical dataset/checkpoint records. Personal paths, internal network
+defaults, camera serial numbers, caches, logs, and robot-specific calibration
+were excluded.
+
+The released vendor transport uses `DIYROBOT_VENDOR_MONITOR_LOG` and defaults
+to `/tmp/diyrobot/vendor_usbcan_monitor.jsonl`. The old internal environment
+variable and its machine-specific default path are not public aliases.
+
+`docs/diyrobot.html` now contains one end-to-end physical-platform guide.
+`docs/real-robot.html` remains only as a redirect for old links.
 
 One paper/source discrepancy remains unresolved: the paper table says `Pull
 Bottle`, while the active prompt-v3 launcher describes pulling a pill box onto

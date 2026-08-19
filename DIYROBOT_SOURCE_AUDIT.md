@@ -1,9 +1,9 @@
-# HiArm Real-Robot Read-Only Audit
+# DIYRobot Lower-Host Read-Only Audit
 
 Audit date: 2026-08-18
 
-Scope: the active HiArm implementation under
-`src/lerobot/robots/hi_arm` on the lower host supplied for this review.
+Scope: the active DIYRobot implementation under the legacy
+`src/lerobot/robots/hi_arm` path on the lower host supplied for this review.
 
 ## Write and execution boundary
 
@@ -14,7 +14,7 @@ devices, start a WebUI, collect data, enable torque, or command motion.
 
 The previous RoboTwin comparison was not fully read-only. Its remote-write
 record is preserved separately in `CHANGELOG_AND_SOURCE_MANIFEST.md`. That
-earlier activity is not attributed to this HiArm audit.
+earlier activity is not attributed to this DIYRobot audit.
 
 ## Active files reviewed
 
@@ -37,6 +37,11 @@ Current arm workflows:
 - `start_hiarm_pi05_policy_client.sh`
 - `hiarm_pi05_policy_tasks_v3.sh`
 - `hiarm_three_camera_webui.py`
+- `remote_camera_webui.py`
+- `hiarm_rest_range_calibrate.py`
+- `hiarm_lerobot_calibrate.py`
+- `hiarm_four_pose_calibrate.py`
+- `hiarm_joint_mapping_calibrate.py`
 
 Operational references:
 
@@ -63,7 +68,7 @@ teleop versions were excluded unless needed to identify an active reference.
 | Arm state | 14 absolute follower positions in degrees |
 | Arm action | 14 absolute follower targets in degrees |
 
-The generic `HiArm` class supports leader, follower, chassis, lift, limit
+The generic DIYRobot class supports leader, follower, chassis, lift, limit
 reader, and camera features through one robot abstraction. The current strict
 teleop, recorder, and policy-client path uses separate left and right follower
 ports. These are distinct connection models and must not be combined without a
@@ -175,10 +180,10 @@ the lower-host source, as the audit was explicitly read-only.
 
 ## Reproduction conclusion
 
-The website can document an end-to-end safe workflow, but the current KinRT
-package does not redistribute the HiArm lower-host source, calibration files,
-or device-specific configuration. A public hardware reproduction requires a
-separate reviewed release of those files, an assembly bill of materials,
-wiring diagrams, device permissions, and a calibration record for the target
-robot. Until those artifacts are released, the real-robot instructions are a
-verified integration guide rather than a self-contained hardware distribution.
+The reviewed lower-host source is now distributed under
+`hardware/diyrobot/lower_host`, with calibration, camera-alignment, and
+provenance documentation. Robot-specific calibration and device identities are
+deliberately excluded and must be generated on the target mechanism. CAD,
+mechanical dimensions, wiring drawings, and task-mat geometry remain pending;
+until those are released, this is a complete software integration release but
+not a mechanically self-contained hardware distribution.

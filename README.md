@@ -166,7 +166,7 @@ Use a separate result directory for every model, checkpoint, task, and condition
 | Balanced-sampling coefficient | 0.5 | Increase minority-archetype exposure |
 | Effective batch size | 32 | Paper training setting |
 | RoboTwin training steps | 10,000 | Paper simulation setting |
-| DIYRobot training steps | 8,000 | Retained real-robot run setting |
+| DIYRobot training steps | 8,000 | Retained physical-platform run setting |
 
 ### Supported Benchmarks
 
@@ -175,7 +175,10 @@ Use a separate result directory for every model, checkpoint, task, and condition
 | RoboTwin 2.0 | 8 | 800 total | 100 Clean + 100 Random trials per task | Policy and evaluation overlay |
 | DIYRobot | 5 | 500 total | 50 standard trials per task + 100 OOD trials | Configs, conversion, serving, and hardware guide |
 
-The full RoboTwin simulator, datasets, base checkpoints, fine-tuned checkpoints, and physical robot are external artifacts and are not bundled in this repository.
+The full RoboTwin simulator, datasets, base checkpoints, fine-tuned checkpoints,
+and physical apparatus are external. The reviewed DIYRobot lower-host source and
+operator documentation are included under `hardware/diyrobot/`; mechanical CAD
+and dimensions remain pending.
 
 > **OOD evaluation.** In addition to the standard DIYRobot protocol, we provide 100 evaluation trials under altered illumination. These lighting-shift trials represent OOD scenes and should be reported separately from the standard-lighting results.
 
@@ -194,8 +197,8 @@ The full RoboTwin simulator, datasets, base checkpoints, fine-tuned checkpoints,
 | End-to-end starting point | [Getting started](https://gleeacast.github.io/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA/getting-started.html) |
 | KinRT design and implementation | [Implementation reference](docs/KINRT_IMPLEMENTATION.md) |
 | RoboTwin training and evaluation | [RoboTwin guide](https://gleeacast.github.io/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA/robotwin.html) |
-| DIYRobot data and evaluation | [DIYRobot guide](https://gleeacast.github.io/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA/diyrobot.html) |
-| HiArm setup and safety gates | [Real-robot guide](https://gleeacast.github.io/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA/real-robot.html) |
+| DIYRobot hardware, data, and evaluation | [DIYRobot guide](https://gleeacast.github.io/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA/diyrobot.html) |
+| DIYRobot lower-host source | [Hardware release](hardware/diyrobot/README.md) |
 | FULL and LoRA differences | [Parameterization comparison](docs/FULL_VS_LORA.md) |
 | Source provenance and release changes | [Change and source manifest](CHANGELOG_AND_SOURCE_MANIFEST.md) |
 

@@ -34,6 +34,11 @@ not represented as `TrainConfig` objects.
 | KinRT-Full | Confirmed OpenPI config | `kinrt_full_diyrobot` | `hiarm_500_new_button_full_moe_k4_8000_bs32/8000` |
 | KinRT-LoRA | Confirmed OpenPI config | `kinrt_lora_diyrobot` | `hiarm_500_new_button_lora_moe_k4_8000_bs32/8000` |
 
+The evaluated checkpoint column preserves immutable historical artifact IDs.
+Those IDs predate the public DIYRobot naming cleanup and must not be renamed in
+provenance records. All public runtime configs and source entry points use
+DIYRobot.
+
 The machine-readable form is `configs/PAPER_MODELS.json`. The original
 evaluation mapping and the normalized OpenPI training-run mapping are retained
 under `manifests`.

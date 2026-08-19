@@ -18,9 +18,10 @@ from urllib.parse import unquote, urlsplit
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE_ROOTS = ("policy", "script")
+SOURCE_ROOTS = ("policy", "script", "hardware/diyrobot/lower_host")
 CODE_SUFFIXES = {".py", ".sh", ".bash", ".yml", ".yaml", ".toml", ".json", ".html", ".css", ".js"}
 CJK = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]")
+LEGACY_DIYROBOT_NAME = re.compile(r"hi[_ -]?arm|hiarm", re.IGNORECASE)
 FORBIDDEN_FILE = re.compile(r"(?:\.py[co]$|\.bak|\.orig$|\.rej$|\.pid$|\.log$)", re.IGNORECASE)
 FORBIDDEN_PARTS = {"__pycache__", ".pytest_cache", ".venv", "checkpoints", "wandb"}
 SECRET_MARKERS = (
@@ -28,6 +29,10 @@ SECRET_MARKERS = (
     "-----BEGIN " + "RSA PRIVATE KEY-----",
     "Key" + "Pair-",
     "10.103." + "92.120",
+    "/home/" + "lxt",
+    "192.168." + "1.168",
+    "95A9" + "A03E",
+    "83B3" + "38EF",
 )
 EXPECTED_CONFIGS = {
     "kinrt_full",
@@ -162,8 +167,14 @@ def source_files() -> list[Path]:
     return [path for source_root in SOURCE_ROOTS for path in files_under(ROOT / source_root)]
 
 
-def manifest_text() -> str:
-    lines = [f"{sha256(path)}  {path.relative_to(ROOT).as_posix()}" for path in source_files()]
+def diyrobot_source_files() -> list[Path]:
+    return files_under(ROOT / "hardware" / "diyrobot" / "lower_host")
+
+
+def manifest_text(paths: list[Path] | None = None, *, relative_to: Path | None = None) -> str:
+    paths = source_files() if paths is None else paths
+    relative_to = ROOT if relative_to is None else relative_to
+    lines = [f"{sha256(path)}  {path.relative_to(relative_to).as_posix()}" for path in paths]
     return "\n".join(lines) + "\n"
 
 
@@ -268,6 +279,26 @@ def validate() -> list[str]:
                     errors.append(f"private credential/host marker in {rel.as_posix()}: {marker}")
 
     config_path = ROOT / "policy" / "pi05" / "src" / "openpi" / "training" / "config.py"
+
+    diyrobot_converter = ROOT / "policy" / "pi05" / "scripts" / "convert_diyrobot_to_lerobot.py"
+    legacy_converter = ROOT / "policy" / "pi05" / "scripts" / "convert_hiarm_to_lerobot.py"
+    if not diyrobot_converter.exists():
+        errors.append("missing DIYRobot data converter")
+    if legacy_converter.exists():
+        errors.append("legacy platform name remains in the public data-converter filename")
+
+    # Public runtime code uses one platform name; provenance records may retain old identifiers.
+    public_diyrobot_code = diyrobot_source_files()
+    if diyrobot_converter.exists():
+        public_diyrobot_code.append(diyrobot_converter)
+    for path in public_diyrobot_code:
+        try:
+            text = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            continue
+        if LEGACY_DIYROBOT_NAME.search(text):
+            errors.append(f"legacy platform name in DIYRobot runtime code: {path.relative_to(ROOT).as_posix()}")
+
     try:
         all_configs = train_config_names(config_path)
     except (SyntaxError, UnicodeDecodeError, ValueError, StopIteration) as exc:
@@ -308,6 +339,12 @@ def write_manifests() -> None:
     manifest_dir = ROOT / "manifests"
     manifest_dir.mkdir(exist_ok=True)
     (manifest_dir / "KINRT_SOURCE_SHA256.txt").write_text(manifest_text(), encoding="utf-8", newline="\n")
+    diyrobot_root = ROOT / "hardware" / "diyrobot"
+    (diyrobot_root / "RELEASE_SOURCE_SHA256.txt").write_text(
+        manifest_text(diyrobot_source_files(), relative_to=diyrobot_root / "lower_host"),
+        encoding="utf-8",
+        newline="\n",
+    )
 
 
 def check_manifests() -> list[str]:
@@ -318,6 +355,15 @@ def check_manifests() -> list[str]:
         errors.append(f"missing manifest: {path.relative_to(ROOT).as_posix()}")
     elif path.read_text(encoding="utf-8") != expected:
         errors.append(f"stale manifest: {path.relative_to(ROOT).as_posix()}")
+    diyrobot_path = ROOT / "hardware" / "diyrobot" / "RELEASE_SOURCE_SHA256.txt"
+    diyrobot_expected = manifest_text(
+        diyrobot_source_files(),
+        relative_to=ROOT / "hardware" / "diyrobot" / "lower_host",
+    )
+    if not diyrobot_path.exists():
+        errors.append(f"missing manifest: {diyrobot_path.relative_to(ROOT).as_posix()}")
+    elif diyrobot_path.read_text(encoding="utf-8") != diyrobot_expected:
+        errors.append(f"stale manifest: {diyrobot_path.relative_to(ROOT).as_posix()}")
     return errors
 
 
