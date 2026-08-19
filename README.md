@@ -19,7 +19,7 @@ Tianhang Yang<sup>1,2,*</sup>, Yanze Zheng<sup>1,*</sup>, Junjie Wang<sup>1</sup
 
 ---
 
-## 🧭 Why KinRT?
+## Why KinRT?
 
 Mixture-of-Experts (MoE) policies can specialize different experts for different robot skills, but conventional routers learn expert assignment implicitly from visual-language observations. This is a poor match for manipulation: visually similar tasks may require very different motions, while visually different tasks may share the same kinematic structure. The signal that best distinguishes these cases, the action trajectory, is also unavailable when the policy is deployed.
 
@@ -51,7 +51,7 @@ KinRT also outperforms the strongest implicit-routing MoE baseline, AdaMoE, by +
 
 ---
 
-## 📦 Released Models
+## Released Models
 
 This repository currently releases the audited source, training configurations, evaluation integration, and reproducibility records. Model checkpoints are not included in this source release; the model links below will be activated after the public upload is complete.
 
@@ -66,7 +66,7 @@ The release also retains the paper-confirmed PI0, AdaMoE, and baseline configura
 
 ---
 
-## 🛠️ Environment Setup
+## Environment Setup
 
 ### Requirements
 
@@ -98,7 +98,7 @@ JAX must list at least one GPU before training. The release intentionally leaves
 
 ---
 
-## 📊 Evaluation
+## Evaluation
 
 KinRT evaluation has three stages:
 
@@ -210,7 +210,7 @@ python tools/validate_release.py --check-manifests
 
 ---
 
-## 📝 Citation
+## Citation
 
 If you use KinRT, please cite:
 
@@ -223,6 +223,6 @@ If you use KinRT, please cite:
 }
 ```
 
-## ⚖️ License
+## License
 
 This release contains components derived from projects with different permissive licenses. OpenPI-derived sources are distributed under [Apache License 2.0](LICENSES/OPENPI_LICENSE.txt), and RoboTwin-derived integration is distributed under the [MIT License](LICENSES/ROBOTWIN_LICENSE.txt). Preserve the applicable notices when redistributing or modifying individual components.

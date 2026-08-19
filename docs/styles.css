@@ -516,14 +516,6 @@ tbody tr:hover td { background: #f8fafb; }
 .footer-logo-link { display: inline-flex; align-items: center; gap: 7px; }
 .footer-logo-link img { width: 17px; height: 17px; }
 
-.heading-icon {
-  display: inline-block;
-  margin-right: 0.22em;
-  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
-  font-size: 0.86em;
-  line-height: 1;
-  vertical-align: 0.04em;
-}
 .system-cell { display: inline-flex; align-items: center; gap: 9px; min-width: 180px; }
 .system-cell img { width: 22px; height: 22px; object-fit: contain; }
 .support { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 680; }
