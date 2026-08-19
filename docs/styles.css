@@ -626,6 +626,7 @@ tbody tr:hover td { background: #f8fafb; }
 .resource-label { gap: 7px; background: #5f6368; }
 .resource-label img { width: 16px; height: 16px; object-fit: contain; }
 .resource-button.paper .resource-label img,
+.resource-button.models .resource-label img,
 .resource-button.code .resource-label img { filter: invert(1); }
 .resource-button.paper .resource-value { background: #b3261e; }
 .resource-button.models .resource-value { background: #ffd166; color: #202124; }
