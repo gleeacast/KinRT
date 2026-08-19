@@ -40,14 +40,14 @@ KinRT is designed for cases where motion structure, rather than visual or lingui
 
 ### Key Results
 
-The paper evaluates eight RoboTwin tasks under Easy (Clean) and Hard (Randomized) conditions and five tasks on the real-world DIYRobot platform. Values below are average successful trials across tasks; RoboTwin scores are out of 100 trials per task and DIYRobot scores are out of 50.
+The paper evaluates five tasks on the real-world DIYRobot platform and eight RoboTwin tasks under Easy (Clean) and Hard (Randomized) conditions. Values below are average successful trials across tasks; DIYRobot scores are out of 50 trials per task and RoboTwin scores are out of 100.
 
 | Benchmark | Baseline | KinRT | Absolute gain | Relative gain |
 | --- | ---: | ---: | ---: | ---: |
-| RoboTwin 2.0 (Easy / Hard) | 33.1 / 34.1 | **40.8 / 38.8** | +7.7 / +4.7 | **+23.26% / +13.78%** |
 | DIYRobot | 29.6 | **35.6** | +6.0 | **+20.27%** |
+| RoboTwin 2.0 (Easy / Hard) | 33.1 / 34.1 | **40.8 / 38.8** | +7.7 / +4.7 | **+23.26% / +13.78%** |
 
-KinRT also outperforms the strongest implicit-routing MoE baseline, AdaMoE, by +8.7/+9.4 successes on RoboTwin Clean/Random and by +14.2 successes on DIYRobot. The results expose a useful adaptation trade-off: LoRA performs best in simulation, while full fine-tuning is stronger on the real platform where the embodiment gap is larger.
+KinRT also outperforms the strongest implicit-routing MoE baseline, AdaMoE, by +14.2 successes on DIYRobot and by +8.7/+9.4 successes on RoboTwin Clean/Random. The results expose a useful adaptation trade-off: full fine-tuning is stronger on the real platform where the embodiment gap is larger, while LoRA performs best in simulation.
 
 ---
 
@@ -57,10 +57,10 @@ This repository currently releases the audited source, training configurations, 
 
 | Model | Configuration | Parameterization | Checkpoint |
 | --- | --- | --- | --- |
-| KinRT-Full (RoboTwin) | `kinrt_full` | PI0.5 full fine-tuning | Coming soon |
-| KinRT-LoRA (RoboTwin) | `kinrt_lora` | PI0.5 LoRA | Coming soon |
 | KinRT-Full (DIYRobot) | `kinrt_full_diyrobot` | PI0.5 full fine-tuning | Coming soon |
 | KinRT-LoRA (DIYRobot) | `kinrt_lora_diyrobot` | PI0.5 LoRA | Coming soon |
+| KinRT-Full (RoboTwin) | `kinrt_full` | PI0.5 full fine-tuning | Coming soon |
+| KinRT-LoRA (RoboTwin) | `kinrt_lora` | PI0.5 LoRA | Coming soon |
 
 The release also retains the paper-confirmed PI0, AdaMoE, and baseline configurations. See the [paper model map](docs/PAPER_MODEL_CONFIG_MAP.md) for all 14 Table 1 entries and their evidence levels.
 
@@ -70,12 +70,12 @@ The release also retains the paper-confirmed PI0, AdaMoE, and baseline configura
 
 ### Requirements
 
-| System | KinRT training | RoboTwin GPU simulation | DIYRobot deployment |
+| System | KinRT training | DIYRobot deployment | RoboTwin GPU simulation |
 | --- | :---: | :---: | :---: |
 | Ubuntu 22.04 / NVIDIA GPU | Supported path | Supported path | Supported path |
-| Other Linux / NVIDIA GPU | Compatibility-dependent | Follow upstream RoboTwin support | Hardware-dependent |
-| Windows / NVIDIA GPU | Not documented | Not documented | Not supported |
-| WSL2 / NVIDIA GPU | Not validated | Not validated | Do not use for hardware control |
+| Other Linux / NVIDIA GPU | Compatibility-dependent | Hardware-dependent | Follow upstream RoboTwin support |
+| Windows / NVIDIA GPU | Not documented | Not supported | Not documented |
+| WSL2 / NVIDIA GPU | Not validated | Do not use for hardware control | Not validated |
 | macOS / Apple silicon | Not supported | Not supported | Not supported |
 
 The supported release path requires Python 3.11 or newer, a CUDA 12-compatible NVIDIA driver, Git with Git LFS, FFmpeg, and [`uv`](https://docs.astral.sh/uv/). RoboTwin evaluation additionally requires a compatible RoboTwin 2.0 checkout. Training requires matching PI0.5 or PI0 base parameters and a LeRobot-format dataset.
@@ -104,7 +104,7 @@ KinRT evaluation has three stages:
 
 1. **Prepare artifacts** - generate kinematic router labels and normalization statistics for the selected dataset.
 2. **Train and serve** - train one named KinRT configuration and start its checkpoint server.
-3. **Evaluate** - run RoboTwin or DIYRobot trials while preserving the task, condition, seed, configuration, and checkpoint identity.
+3. **Evaluate** - run DIYRobot or RoboTwin trials while preserving the task, condition, seed, configuration, and checkpoint identity.
 
 ### Quick Start
 
@@ -172,8 +172,8 @@ Use a separate result directory for every model, checkpoint, task, and condition
 
 | Benchmark | Tasks | Training demonstrations | Evaluation protocol | Release support |
 | --- | ---: | ---: | --- | --- |
-| RoboTwin 2.0 | 8 | 800 total | 100 Clean + 100 Random trials per task | Policy and evaluation overlay |
 | DIYRobot | 5 | 500 total | 50 trials per task in the original environment | Configs, conversion, serving, and hardware guide |
+| RoboTwin 2.0 | 8 | 800 total | 100 Clean + 100 Random trials per task | Policy and evaluation overlay |
 
 The full RoboTwin simulator, datasets, base checkpoints, fine-tuned checkpoints,
 and physical apparatus are external. The reviewed DIYRobot lower-host source and
@@ -186,8 +186,8 @@ and dimensions remain pending.
 
 - Router-label generation uses KMeans with `K=4`, PCA-64 features, and seed `0` in the released command.
 - Training uses balanced sampling with coefficient `0.5` to retain the empirical distribution while exposing minority archetypes.
-- RoboTwin reports Clean and Random conditions separately; each average is computed from eight per-task success counts.
 - DIYRobot uses five tasks and reports the average success count out of 50 trials.
+- RoboTwin reports Clean and Random conditions separately; each average is computed from eight per-task success counts.
 - Every result must record the source revision, dataset digest, router-label digest, normalization assets, checkpoint step, seeds, and evaluation condition.
 
 ### Reproduction Documentation
@@ -196,9 +196,9 @@ and dimensions remain pending.
 | --- | --- |
 | End-to-end starting point | [Getting started](https://gleeacast.github.io/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA/getting-started.html) |
 | KinRT design and implementation | [Implementation reference](docs/KINRT_IMPLEMENTATION.md) |
-| RoboTwin training and evaluation | [RoboTwin guide](https://gleeacast.github.io/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA/robotwin.html) |
 | DIYRobot hardware, data, and evaluation | [DIYRobot guide](https://gleeacast.github.io/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA/diyrobot.html) |
 | DIYRobot lower-host source | [Hardware release](hardware/diyrobot/README.md) |
+| RoboTwin training and evaluation | [RoboTwin guide](https://gleeacast.github.io/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA/robotwin.html) |
 | FULL and LoRA differences | [Parameterization comparison](docs/FULL_VS_LORA.md) |
 | Source provenance and release changes | [Change and source manifest](CHANGELOG_AND_SOURCE_MANIFEST.md) |
 
@@ -222,6 +222,10 @@ If you use KinRT, please cite:
   year={2026}
 }
 ```
+
+## Acknowledgements
+
+We thank Xiaoteng Liu for his engineering contributions to the KinRT project.
 
 ## License
 

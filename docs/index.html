@@ -13,21 +13,21 @@
     <link rel="canonical" href="https://gleeacast.github.io/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA/" />
     <link rel="preload" as="image" href="assets/images/diyrobot-platform-hero.jpg" type="image/jpeg" fetchpriority="high" />
     <title>KinRT | Route by Kinematics, Act by Observation</title>
-    <link rel="stylesheet" href="styles.css?v=20260819-8" />
+    <link rel="stylesheet" href="styles.css?v=20260819-9" />
     <script src="app.js?v=20260819-1" defer></script>
   </head>
   <body data-page="home">
     <a class="skip-link" href="#main">Skip to content</a>
     <header class="site-header">
       <div class="header-inner">
-        <a class="brand" href="index.html" aria-label="KinRT project home"><span class="brand-mark">KR</span>KinRT</a>
+        <a class="brand" href="index.html" aria-label="KinRT project home"><span class="brand-mark">Kin</span>KinRT</a>
         <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="primary-nav">Menu</button>
         <nav class="primary-nav" id="primary-nav" data-primary-nav aria-label="Primary navigation">
           <a href="#problem">Problem</a>
           <a href="#method">Method</a>
           <a href="#results">Results</a>
-          <a href="robotwin.html" data-page-link="robotwin">RoboTwin</a>
           <a href="diyrobot.html" data-page-link="diyrobot">DIYRobot</a>
+          <a href="robotwin.html" data-page-link="robotwin">RoboTwin</a>
           <a href="getting-started.html" data-page-link="start">Reproduce</a>
           <a href="https://arxiv.org/abs/2607.26807">Paper</a>
           <a href="https://github.com/gleeacast/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA">GitHub</a>
@@ -42,7 +42,7 @@
           <p class="project-eyebrow">Kinematics-supervised expert routing</p>
           <h1 id="page-title">KinRT</h1>
           <p class="project-title">Route by Kinematics, Act by Observation</p>
-          <p class="project-summary">Action trajectories teach a global router which motion expert to select. At deployment, the policy routes from the current visual-language observation only.</p>
+          <p class="project-summary">Explicit kinematics-guided MoE routing distills action priors into observation space.</p>
           <p class="project-authors">Tianhang Yang<sup>*</sup>, Yanze Zheng<sup>*</sup>, Junjie Wang, Wei-Bin Kou<sup>&dagger;</sup>, Ruotong Li, Yujiu Yang<sup>&dagger;</sup></p>
           <p class="project-affiliation">Tsinghua University &middot; Pengcheng Lab &middot; <sup>*</sup>Equal contribution &middot; <sup>&dagger;</sup>Corresponding authors</p>
           <div class="project-actions" aria-label="Project links">
@@ -95,30 +95,30 @@
         <div class="project-inner section-heading">
           <p class="kicker">Key results</p>
           <h2 id="results-title">Consistent gains across simulation and hardware.</h2>
-          <p>Reported values are average successful trials across eight RoboTwin tasks and five DIYRobot tasks.</p>
+          <p>Reported values are average successful trials across five DIYRobot tasks and eight RoboTwin tasks.</p>
         </div>
         <div class="project-inner result-rail" aria-label="KinRT relative improvements">
+          <div><strong>+20.27%</strong><span>DIYRobot</span></div>
           <div><strong>+23.26%</strong><span>RoboTwin Easy</span></div>
           <div><strong>+13.78%</strong><span>RoboTwin Hard</span></div>
-          <div><strong>+20.27%</strong><span>DIYRobot</span></div>
         </div>
         <div class="project-inner table-wrap result-table">
           <table>
             <thead><tr><th>Benchmark</th><th>Dense baseline</th><th>KinRT</th><th>Absolute gain</th><th>Relative gain</th></tr></thead>
             <tbody>
-              <tr><td>RoboTwin 2.0 <small>Easy / Hard</small></td><td>33.1 / 34.1</td><td><strong>40.8 / 38.8</strong></td><td>+7.7 / +4.7</td><td><strong>+23.26% / +13.78%</strong></td></tr>
               <tr><td>DIYRobot</td><td>29.6</td><td><strong>35.6</strong></td><td>+6.0</td><td><strong>+20.27%</strong></td></tr>
+              <tr><td>RoboTwin 2.0 <small>Easy / Hard</small></td><td>33.1 / 34.1</td><td><strong>40.8 / 38.8</strong></td><td>+7.7 / +4.7</td><td><strong>+23.26% / +13.78%</strong></td></tr>
             </tbody>
           </table>
         </div>
-        <p class="project-inner result-note">KinRT also surpasses the strongest implicit-routing MoE baseline, AdaMoE, by +8.7/+9.4 successes on RoboTwin Easy/Hard and by +14.2 successes on DIYRobot.</p>
+        <p class="project-inner result-note">KinRT also surpasses the strongest implicit-routing MoE baseline, AdaMoE, by +14.2 successes on DIYRobot and by +8.7/+9.4 successes on RoboTwin Easy/Hard.</p>
       </section>
 
       <section class="project-band project-demos" id="demos" aria-labelledby="demos-title">
         <div class="project-inner section-heading">
           <p class="kicker">Real-robot demonstrations</p>
           <h2 id="demos-title">DIYRobot in action.</h2>
-          <p>Representative physical rollouts show KinRT controlling coordinated, contact-rich tasks from three complementary viewpoints.</p>
+          <p>Representative physical rollouts show KinRT controlling coordinated, contact-rich tasks from three complementary viewpoints. Residual action jitter can be mitigated through output smoothing, temporal ensembling, and controller-level tuning.</p>
         </div>
         <div class="project-inner demo-video-grid">
           <figure class="demo-video">
@@ -153,13 +153,9 @@
         <div class="project-inner section-heading">
           <p class="kicker">Evaluation</p>
           <h2 id="benchmarks-title">Two platforms, one controlled comparison.</h2>
-          <p>RoboTwin uses Easy and Hard conditions. DIYRobot keeps a 50-trial original-environment test protocol, with altered-lighting demonstrations available only as optional training data.</p>
+          <p>DIYRobot keeps a 50-trial original-environment test protocol, with altered-lighting demonstrations available only as optional training data. RoboTwin uses Easy and Hard conditions.</p>
         </div>
         <div class="project-inner benchmark-gallery">
-          <a href="robotwin.html" class="benchmark-panel">
-            <img src="assets/images/posters/robotwin-05_place_dual_shoes_random.jpg" alt="RoboTwin randomized dual-shoe placement task" loading="lazy" />
-            <span>RoboTwin 2.0</span><strong>8 tasks &middot; Easy and Hard</strong><p>100 trials per task and condition.</p>
-          </a>
           <a href="diyrobot.html" class="benchmark-panel">
             <img src="assets/images/diyrobot-platform-hero.jpg" alt="The DIYRobot dual-arm platform" loading="lazy" />
             <span>DIYRobot</span><strong>5 tasks &middot; 14-DoF</strong><p>50 standard trials per task.</p>
@@ -167,6 +163,10 @@
           <a href="diyrobot.html#report" class="benchmark-panel">
             <img src="assets/images/posters/diyrobot-06_ood_place_pill_box_old_scene.jpg" alt="DIYRobot task under altered illumination" loading="lazy" />
             <span>Optional OOD data</span><strong>100 training demonstrations</strong><p>Train optionally under altered illumination; evaluate 50 trials per task in the original scene.</p>
+          </a>
+          <a href="robotwin.html" class="benchmark-panel">
+            <img src="assets/images/posters/robotwin-05_place_dual_shoes_random.jpg" alt="RoboTwin randomized dual-shoe placement task" loading="lazy" />
+            <span>RoboTwin 2.0</span><strong>8 tasks &middot; Easy and Hard</strong><p>100 trials per task and condition.</p>
           </a>
         </div>
       </section>
@@ -184,8 +184,8 @@
         <nav class="project-inner reproduce-links" aria-label="KinRT reproduction guides">
           <a href="getting-started.html"><span>01</span><strong>Getting started</strong><small>Environment and artifact checks</small></a>
           <a href="method.html"><span>02</span><strong>Implementation</strong><small>Labels, router, loss, and variants</small></a>
-          <a href="robotwin.html"><span>03</span><strong>RoboTwin guide</strong><small>Simulation training and evaluation</small></a>
-          <a href="diyrobot.html"><span>04</span><strong>DIYRobot guide</strong><small>Hardware, data, deployment, and OOD</small></a>
+          <a href="diyrobot.html"><span>03</span><strong>DIYRobot guide</strong><small>Hardware, data, deployment, and OOD</small></a>
+          <a href="robotwin.html"><span>04</span><strong>RoboTwin guide</strong><small>Simulation training and evaluation</small></a>
           <a href="reference.html"><span>05</span><strong>Reference</strong><small>Configs, artifacts, and troubleshooting</small></a>
         </nav>
       </section>

@@ -81,14 +81,15 @@ code, pre { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospac
   white-space: nowrap;
 }
 .brand-mark {
-  width: 30px;
+  min-width: 36px;
+  padding: 0 7px;
   height: 30px;
   display: grid;
   place-items: center;
   color: #fff;
   background: var(--ink);
   border-radius: 5px;
-  font-size: 13px;
+  font-size: 12px;
 }
 .primary-nav {
   display: flex;
