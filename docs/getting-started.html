@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Beginner setup guide for KinRT source, datasets, router labels, normalization, and training." />
     <title>Getting Started | KinRT</title>
-    <link rel="stylesheet" href="styles.css?v=20260819-2" />
+    <link rel="stylesheet" href="styles.css?v=20260819-3" />
     <script src="app.js?v=20260819-1" defer></script>
   </head>
   <body data-page="start">
@@ -21,21 +21,14 @@
 
       <main class="doc-main" id="main">
         <header class="doc-header">
-          <p class="kicker">Common setup</p><h1>Getting started</h1>
+          <p class="kicker">Common setup</p><h1><span class="heading-icon" aria-hidden="true">🛠️</span>Getting started</h1>
           <p class="doc-lead">Prepare a clean KinRT environment and verify every external input before launching a long training run. This page stops at a one-step software smoke test; benchmark-specific commands follow on the RoboTwin and DIYRobot pages.</p>
           <div class="doc-meta"><span>Audience: first-time user</span><span>Platform: Linux GPU host</span><span>Runtime: Python 3.11+, CUDA 12, uv</span></div>
         </header>
 
         <section class="section" id="prerequisites">
           <div class="section-head"><span class="section-index">01</span><div><h2>Check the prerequisites</h2></div></div>
-          <p>The validated release path uses Ubuntu, an NVIDIA CUDA stack, and the pinned Python workspace. The logos below link directly to the required upstream tools.</p>
-          <div class="tool-logo-grid" aria-label="Required software">
-            <a href="https://ubuntu.com/"><img src="assets/icons/ubuntu.svg" alt="" /><strong>Ubuntu</strong><span>22.04 recorded</span></a>
-            <a href="https://www.python.org/"><img src="assets/icons/python.svg" alt="" /><strong>Python</strong><span>3.11 or newer</span></a>
-            <a href="https://www.nvidia.com/"><img src="assets/icons/nvidia.svg" alt="" /><strong>NVIDIA</strong><span>CUDA 12 driver</span></a>
-            <a href="https://git-scm.com/"><img src="assets/icons/git.svg" alt="" /><strong>Git + LFS</strong><span>Source and assets</span></a>
-            <a href="https://docs.astral.sh/uv/"><img src="assets/icons/uv.svg" alt="" /><strong>uv</strong><span>Pinned environment</span></a>
-          </div>
+          <p>The validated release path uses Ubuntu, an NVIDIA CUDA stack, and the pinned Python workspace. Verify the supported combinations below before installing the command-line dependencies.</p>
           <div class="table-wrap support-table"><table><thead><tr><th>System / GPU</th><th>KinRT training</th><th>RoboTwin GPU simulation</th><th>DIYRobot deployment</th></tr></thead><tbody>
             <tr><td><span class="system-cell"><img src="assets/icons/ubuntu.svg" alt="" />Ubuntu 22.04 / NVIDIA</span></td><td><span class="support yes">Supported path</span></td><td><span class="support yes">Supported path</span></td><td><span class="support yes">Supported path</span></td></tr>
             <tr><td><span class="system-cell"><img src="assets/icons/linux.svg" alt="" />Other Linux / NVIDIA</span></td><td><span class="support conditional">Compatibility-dependent</span></td><td><span class="support conditional">Follow RoboTwin support</span></td><td><span class="support conditional">Hardware-dependent</span></td></tr>
