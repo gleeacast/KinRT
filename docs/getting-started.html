@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Beginner setup guide for KinRT source, datasets, router labels, normalization, and training." />
     <title>Getting Started | KinRT</title>
-    <link rel="stylesheet" href="styles.css?v=20260819-1" />
-    <script src="app.js?v=20260818-2" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260819-2" />
+    <script src="app.js?v=20260819-1" defer></script>
   </head>
   <body data-page="start">
     <a class="skip-link" href="#main">Skip to content</a>
@@ -28,12 +28,22 @@
 
         <section class="section" id="prerequisites">
           <div class="section-head"><span class="section-index">01</span><div><h2>Check the prerequisites</h2></div></div>
-          <div class="checklist">
-            <div class="check-item"><strong>Operating system</strong><p>Ubuntu 22.04 or a compatible Linux distribution. Windows is suitable for reading the site, not for the recorded JAX/CUDA workflow.</p></div>
-            <div class="check-item"><strong>GPU stack</strong><p>NVIDIA driver with CUDA 12 support. The FULL variant requires substantially more trainable memory than LoRA.</p></div>
-            <div class="check-item"><strong>Tools</strong><p>Git, Git LFS, FFmpeg, Python 3.11 or newer, and uv.</p></div>
-            <div class="check-item"><strong>Storage</strong><p>Space for the dataset, base parameters, normalization assets, labels, checkpoints, and evaluation videos.</p></div>
+          <p>The validated release path uses Ubuntu, an NVIDIA CUDA stack, and the pinned Python workspace. The logos below link directly to the required upstream tools.</p>
+          <div class="tool-logo-grid" aria-label="Required software">
+            <a href="https://ubuntu.com/"><img src="assets/icons/ubuntu.svg" alt="" /><strong>Ubuntu</strong><span>22.04 recorded</span></a>
+            <a href="https://www.python.org/"><img src="assets/icons/python.svg" alt="" /><strong>Python</strong><span>3.11 or newer</span></a>
+            <a href="https://www.nvidia.com/"><img src="assets/icons/nvidia.svg" alt="" /><strong>NVIDIA</strong><span>CUDA 12 driver</span></a>
+            <a href="https://git-scm.com/"><img src="assets/icons/git.svg" alt="" /><strong>Git + LFS</strong><span>Source and assets</span></a>
+            <a href="https://docs.astral.sh/uv/"><img src="assets/icons/uv.svg" alt="" /><strong>uv</strong><span>Pinned environment</span></a>
           </div>
+          <div class="table-wrap support-table"><table><thead><tr><th>System / GPU</th><th>KinRT training</th><th>RoboTwin GPU simulation</th><th>DIYRobot deployment</th></tr></thead><tbody>
+            <tr><td><span class="system-cell"><img src="assets/icons/ubuntu.svg" alt="" />Ubuntu 22.04 / NVIDIA</span></td><td><span class="support yes">Supported path</span></td><td><span class="support yes">Supported path</span></td><td><span class="support yes">Supported path</span></td></tr>
+            <tr><td><span class="system-cell"><img src="assets/icons/linux.svg" alt="" />Other Linux / NVIDIA</span></td><td><span class="support conditional">Compatibility-dependent</span></td><td><span class="support conditional">Follow RoboTwin support</span></td><td><span class="support conditional">Hardware-dependent</span></td></tr>
+            <tr><td>Windows / NVIDIA</td><td><span class="support no">Not documented</span></td><td><span class="support no">Not documented</span></td><td><span class="support no">Not supported</span></td></tr>
+            <tr><td>WSL2 / NVIDIA</td><td><span class="support no">Not validated</span></td><td><span class="support no">Not validated</span></td><td><span class="support no">Do not use</span></td></tr>
+            <tr><td>macOS / Apple silicon</td><td><span class="support no">Not supported</span></td><td><span class="support no">Not supported</span></td><td><span class="support no">Not supported</span></td></tr>
+          </tbody></table></div>
+          <p>Also install FFmpeg and reserve storage for datasets, base parameters, normalization assets, router labels, checkpoints, and evaluation videos. FULL requires substantially more trainable GPU memory than LoRA.</p>
           <div class="code-block"><div class="code-toolbar"><span>Host checks</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>python3 --version
 nvidia-smi
 git lfs version
@@ -112,14 +122,8 @@ PY</code></pre></div>
 
         <section class="section" id="smoke">
           <div class="section-head"><span class="section-index">07</span><div><h2>Run a bounded training smoke test</h2></div></div>
-          <p>Generate router labels first, then compute norm stats. Before a full run, override the selected config in a disposable copy to one step and one checkpoint. Do not publish smoke settings as benchmark settings.</p>
-          <div class="code-block"><div class="code-toolbar"><span>Core pipeline</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>uv run python scripts/generate_router_labels.py \
-  --repo-root /data/lerobot/my_dataset \
-  --output-dir /data/lerobot/my_dataset/meta/router_labels_k4 \
-  --action-horizon 50 --feature-mode chunk_velocity \
-  --pca-components 64 --num-clusters 4 --seed 0
-
-uv run python scripts/compute_norm_stats.py --config-name kinrt_lora
+          <p>Complete the <a href="method.html#labels">KinRT offline-label procedure</a> first, then compute norm stats. Before a full run, override the selected config in a disposable copy to one step and one checkpoint. Do not publish smoke settings as benchmark settings.</p>
+          <div class="code-block"><div class="code-toolbar"><span>Training smoke gate</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>uv run python scripts/compute_norm_stats.py --config-name kinrt_lora
 uv run python scripts/train.py kinrt_lora --exp-name kinrt_smoke</code></pre></div>
           <div class="callout success"><strong>Expected gate</strong><p>Data loading succeeds, total loss and router loss are finite, all four label classes are observable, and a checkpoint can be written and restored.</p></div>
         </section>

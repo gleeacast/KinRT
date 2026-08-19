@@ -12,8 +12,8 @@
     <meta property="og:url" content="https://gleeacast.github.io/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA/" />
     <link rel="canonical" href="https://gleeacast.github.io/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA/" />
     <title>KinRT | Route by Kinematics, Act by Observation</title>
-    <link rel="stylesheet" href="styles.css?v=20260819-1" />
-    <script src="app.js?v=20260818-3" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260819-2" />
+    <script src="app.js?v=20260819-1" defer></script>
   </head>
   <body data-page="home">
     <a class="skip-link" href="#main">Skip to content</a>
@@ -28,6 +28,8 @@
           <a href="robotwin.html" data-page-link="robotwin">RoboTwin</a>
           <a href="diyrobot.html" data-page-link="diyrobot">DIYRobot</a>
           <a href="getting-started.html" data-page-link="start">Reproduce</a>
+          <a class="nav-icon-link" href="https://arxiv.org/abs/2607.26807" aria-label="KinRT paper on arXiv"><img src="assets/icons/arxiv.svg" alt="" /><span>Paper</span></a>
+          <a class="nav-icon-link" href="https://github.com/gleeacast/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA" aria-label="KinRT source on GitHub"><img src="assets/icons/github.svg" alt="" /><span>Source</span></a>
         </nav>
       </div>
     </header>
@@ -43,9 +45,16 @@
           <p class="project-authors">Tianhang Yang<sup>*</sup>, Yanze Zheng<sup>*</sup>, Junjie Wang, Wei-Bin Kou<sup>&dagger;</sup>, Ruotong Li, Yujiu Yang<sup>&dagger;</sup></p>
           <p class="project-affiliation">Tsinghua University &middot; Pengcheng Lab &middot; <sup>*</sup>Equal contribution &middot; <sup>&dagger;</sup>Corresponding authors</p>
           <div class="project-actions" aria-label="Project links">
-            <a class="button primary" href="https://arxiv.org/abs/2607.26807">Read the paper</a>
-            <a class="button secondary" href="https://github.com/gleeacast/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA">View the code</a>
+            <a class="button primary" href="https://arxiv.org/abs/2607.26807"><img src="assets/icons/arxiv.svg" alt="" />arXiv paper</a>
+            <a class="button secondary" href="https://github.com/gleeacast/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA"><img src="assets/icons/github.svg" alt="" />GitHub repository</a>
             <a class="text-action" href="getting-started.html">Reproduce KinRT <span aria-hidden="true">&rarr;</span></a>
+          </div>
+          <div class="project-tool-row" aria-label="Core open-source tools">
+            <span>Open stack</span>
+            <img src="assets/icons/linux.svg" alt="Linux" title="Linux" />
+            <img src="assets/icons/python.svg" alt="Python" title="Python" />
+            <img src="assets/icons/nvidia.svg" alt="NVIDIA" title="NVIDIA CUDA" />
+            <img src="assets/icons/uv.svg" alt="uv" title="uv" />
           </div>
         </div>
       </section>
@@ -112,8 +121,8 @@
       <section class="project-band project-benchmarks" aria-labelledby="benchmarks-title">
         <div class="project-inner section-heading">
           <p class="kicker">Evaluation</p>
-          <h2 id="benchmarks-title">Two platforms, three evaluation regimes.</h2>
-          <p>Simulation, standard real-world trials, and illumination-shift OOD trials test whether kinematic routing transfers across environments.</p>
+          <h2 id="benchmarks-title">Two platforms, one controlled comparison.</h2>
+          <p>RoboTwin uses Easy and Hard conditions. DIYRobot keeps a 50-trial original-environment test protocol, with altered-lighting demonstrations available only as optional training data.</p>
         </div>
         <div class="project-inner benchmark-gallery">
           <a href="robotwin.html" class="benchmark-panel">
@@ -124,9 +133,9 @@
             <img src="assets/images/diyrobot-platform.png" alt="The DIYRobot dual-arm platform" loading="lazy" />
             <span>DIYRobot</span><strong>5 tasks &middot; 14-DoF</strong><p>50 standard trials per task.</p>
           </a>
-          <a href="diyrobot.html" class="benchmark-panel">
+          <a href="diyrobot.html#report" class="benchmark-panel">
             <img src="assets/images/posters/diyrobot-06_ood_place_pill_box_old_scene.jpg" alt="DIYRobot task under altered illumination" loading="lazy" />
-            <span>OOD lighting</span><strong>100 additional trials</strong><p>Altered illumination, reported separately.</p>
+            <span>Optional OOD data</span><strong>100 training demonstrations</strong><p>Train optionally under altered illumination; evaluate 50 trials per task in the original scene.</p>
           </a>
         </div>
       </section>
@@ -173,7 +182,7 @@
     </main>
 
     <footer class="site-footer">
-      <div class="footer-inner"><span>KinRT &middot; Tsinghua University &middot; Pengcheng Lab</span><nav class="footer-links" aria-label="Footer"><a href="https://arxiv.org/abs/2607.26807">Paper</a><a href="https://github.com/gleeacast/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA">Code</a><a href="getting-started.html">Reproduce</a></nav></div>
+      <div class="footer-inner"><span>KinRT &middot; Tsinghua University &middot; Pengcheng Lab</span><nav class="footer-links" aria-label="Footer"><a class="footer-logo-link" href="https://arxiv.org/abs/2607.26807"><img src="assets/icons/arxiv.svg" alt="" />Paper</a><a class="footer-logo-link" href="https://github.com/gleeacast/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA"><img src="assets/icons/github.svg" alt="" />Code</a><a href="getting-started.html">Reproduce</a></nav></div>
     </footer>
   </body>
 </html>

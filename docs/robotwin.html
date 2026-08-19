@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="End-to-end KinRT reproduction workflow for RoboTwin 2.0 training and evaluation." />
     <title>RoboTwin Reproduction | KinRT</title>
-    <link rel="stylesheet" href="styles.css?v=20260819-1" />
-    <script src="app.js?v=20260818-2" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260819-2" />
+    <script src="app.js?v=20260819-1" defer></script>
   </head>
   <body data-page="robotwin">
     <a class="skip-link" href="#main">Skip to content</a>
@@ -15,7 +15,7 @@
     <div class="page docs-shell">
       <aside class="sidebar" aria-label="Documentation navigation">
         <p class="sidebar-label">Reproduce</p><nav><a href="getting-started.html" data-page-link="start">Getting started</a><a href="method.html" data-page-link="method">Method</a><a href="robotwin.html" data-page-link="robotwin">RoboTwin</a><a href="diyrobot.html" data-page-link="diyrobot">DIYRobot</a><a href="reference.html" data-page-link="reference">Reference</a></nav>
-        <div class="sidebar-divider"></div><p class="sidebar-label">On this page</p><nav><a href="#scope">Scope</a><a href="#simulator">Simulator</a><a href="#data">Dataset</a><a href="#labels">Labels</a><a href="#train">Training</a><a href="#evaluation">Evaluation</a><a href="#tasks">Task matrix</a><a href="#reporting">Reporting</a></nav>
+        <div class="sidebar-divider"></div><p class="sidebar-label">On this page</p><nav><a href="#scope">Scope</a><a href="#simulator">Simulator</a><a href="#data">Dataset</a><a href="#train">Training</a><a href="#evaluation">Evaluation</a><a href="#tasks">Task matrix</a><a href="#reporting">Reporting</a></nav>
       </aside>
       <main class="doc-main" id="main">
         <header class="doc-header">
@@ -62,25 +62,9 @@ uv sync --frozen</code></pre></div>
           <p>Replace the placeholder <code>repo_id="demo_mixed_repo"</code> with the local LeRobot dataset identity. Verify episode count, frame count, field shapes, action units, and global index coverage.</p>
         </section>
 
-        <section class="section" id="labels">
-          <div class="section-head"><span class="section-index">04</span><div><h2>Generate and verify K=4 labels</h2></div></div>
-          <div class="code-block"><div class="code-toolbar"><span>RoboTwin router labels</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>cd "$ROBOTWIN_ROOT/policy/pi05"
-uv run python scripts/generate_router_labels.py \
-  --repo-root /data/lerobot/robotwin_800 \
-  --output-dir /data/lerobot/robotwin_800/meta/router_labels_k4 \
-  --episodes 0:800 \
-  --action-horizon 50 \
-  --feature-mode chunk_velocity \
-  --pca-components 64 \
-  --num-clusters 4 \
-  --seed 0</code></pre></div>
-          <p>For an exact comparison against the audited run, the label array digest is <code>bceda7104ee949d37c9872a50c06842a111387ad5b63eb9011d50e19b33b256a</code>. A newly reconstructed dataset may produce a different digest; report it instead of claiming byte identity.</p>
-          <div class="callout success"><strong>Expected gate</strong><p>The selected 162,545 sample indices all map to non-negative labels and the summary reports four non-empty clusters.</p></div>
-        </section>
-
         <section class="section" id="train">
-          <div class="section-head"><span class="section-index">05</span><div><h2>Compute norm stats and train</h2></div></div>
-          <p>Point the selected config to the local dataset, labels, base weights, and writable output. Keep one config name from normalization through serving.</p>
+          <div class="section-head"><span class="section-index">04</span><div><h2>Compute norm stats and train</h2></div></div>
+          <p>Generate and verify the K=4 supervision using the <a href="method.html#labels">KinRT method procedure</a>, then point the selected config to the local dataset, labels, base weights, and writable output. Keep one config name from normalization through serving.</p>
           <div class="code-block"><div class="code-toolbar"><span>FULL training</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>cd "$ROBOTWIN_ROOT/policy/pi05"
 uv run python scripts/compute_norm_stats.py --config-name kinrt_full
 uv run python scripts/train.py kinrt_full --exp-name robotwin_kinrt_full</code></pre></div>
@@ -91,7 +75,7 @@ uv run python scripts/train.py kinrt_lora --exp-name robotwin_kinrt_lora</code><
         </section>
 
         <section class="section" id="evaluation">
-          <div class="section-head"><span class="section-index">06</span><div><h2>Evaluate one immutable checkpoint</h2></div></div>
+          <div class="section-head"><span class="section-index">05</span><div><h2>Evaluate one immutable checkpoint</h2></div></div>
           <p>Create <code>deploy_policy.yml</code> from the included example. Resolve every placeholder before starting the server.</p>
           <div class="code-block"><div class="code-toolbar"><span>Required deployment fields</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>policy_name: pi05
 task_name: &lt;task-module-name&gt;
@@ -121,7 +105,7 @@ MODEL_SERVER_HOST=&lt;reachable-server-host&gt; \
         </section>
 
         <section class="section" id="tasks">
-          <div class="section-head"><span class="section-index">07</span><div><h2>Complete the 16-condition task matrix</h2></div></div>
+          <div class="section-head"><span class="section-index">06</span><div><h2>Complete the 16-condition task matrix</h2></div></div>
           <p>Resolve the exact task module and task-config filenames from the compatible RoboTwin checkout. The paper reports these eight task labels under both clean and randomized conditions.</p>
           <div class="poster-grid">
             <div class="poster-item"><img src="assets/images/posters/robotwin-01_hand_block_clean.jpg" alt="RoboTwin hand block task" /><span>Hand block</span></div>
@@ -142,7 +126,7 @@ MODEL_SERVER_HOST=&lt;reachable-server-host&gt; \
         </section>
 
         <section class="section" id="reporting">
-          <div class="section-head"><span class="section-index">08</span><div><h2>Report enough information to audit the result</h2></div></div>
+          <div class="section-head"><span class="section-index">07</span><div><h2>Report enough information to audit the result</h2></div></div>
           <ul>
             <li>FULL or LoRA config name, source commit, and all config overrides.</li>
             <li>Dataset identity, frame count, label digest, norm-stat asset ID, and base checkpoint.</li>

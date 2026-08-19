@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="DIYRobot hardware, calibration, camera alignment, data collection, KinRT training, and evaluation." />
     <title>DIYRobot Reproduction | KinRT</title>
-    <link rel="stylesheet" href="styles.css?v=20260819-1" />
-    <script src="app.js?v=20260818-2" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260819-2" />
+    <script src="app.js?v=20260819-1" defer></script>
   </head>
   <body data-page="diyrobot">
     <a class="skip-link" href="#main">Skip to content</a>
     <header class="site-header"><div class="header-inner"><a class="brand" href="index.html"><span class="brand-mark">KR</span>KinRT</a><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="primary-nav">Menu</button><nav class="primary-nav" id="primary-nav" data-primary-nav aria-label="Primary navigation"><a href="getting-started.html" data-page-link="start">Start</a><a href="method.html" data-page-link="method">Method</a><a href="robotwin.html" data-page-link="robotwin">RoboTwin</a><a href="diyrobot.html" data-page-link="diyrobot">DIYRobot</a><a href="reference.html" data-page-link="reference">Reference</a></nav></div></header>
-    <div class="release-strip"><div class="release-strip-inner"><span><span class="status-dot"></span><strong>Source</strong> lower host released</span><span><strong>Control/data</strong> 20 FPS</span><span><strong>Evaluation</strong> 5 x 50 + 100 OOD</span><span><span class="status-dot external"></span><strong>CAD</strong> pending</span></div></div>
+    <div class="release-strip"><div class="release-strip-inner"><span><span class="status-dot"></span><strong>Source</strong> lower host released</span><span><strong>Control/data</strong> 20 FPS</span><span><strong>Evaluation</strong> 5 x 50</span><span><strong>Optional data</strong> +100 OOD demos</span><span><span class="status-dot external"></span><strong>CAD</strong> pending</span></div></div>
 
     <div class="page docs-shell">
       <aside class="sidebar" aria-label="Documentation navigation">
@@ -145,16 +145,9 @@ EPISODES=1 EPISODE_TIME=20 RESET_TIME=0 FPS=20 &#92;
         </section>
 
         <section class="section" id="train">
-          <div class="section-head"><span class="section-index">08</span><div><h2>Generate KinRT labels and train</h2></div></div>
-          <p>Freeze the dataset digest before label generation. FULL and LoRA are optimization regimes of the same KinRT method.</p>
-          <div class="code-block"><div class="code-toolbar"><span>Labels and training</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>cd /path/to/KinRT/policy/pi05
-
-uv run python scripts/generate_router_labels.py &#92;
-  --repo-root /data/diyrobot/five_tasks &#92;
-  --output-dir /data/diyrobot/five_tasks/meta/router_labels_k4 &#92;
-  --action-horizon 50 --feature-mode chunk_velocity &#92;
-  --pca-components 64 --num-clusters 4 --seed 0
-
+          <div class="section-head"><span class="section-index">08</span><div><h2>Prepare method labels and train</h2></div></div>
+          <p>Freeze the dataset digest, then create and verify K=4 supervision using the <a href="method.html#labels">KinRT method procedure</a> with the DIYRobot dataset path. FULL and LoRA are optimization regimes of the same method.</p>
+          <div class="code-block"><div class="code-toolbar"><span>Normalization and training</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>cd /path/to/KinRT/policy/pi05
 uv run python scripts/compute_norm_stats.py &#92;
   --config-name kinrt_full_diyrobot
 uv run python scripts/train.py kinrt_full_diyrobot &#92;
@@ -180,9 +173,10 @@ ALLOW_MOTION=1 DURATION=30 ACTION_CHUNK_STEPS=1 &#92;
         </section>
 
         <section class="section" id="report">
-          <div class="section-head"><span class="section-index">10</span><div><h2>Report standard and OOD trials separately</h2></div></div>
-          <p>Evaluate the five prompt-v3 tasks with 50 standard trials each. Record task, prompt variant, checkpoint, calibration digests, camera reference, operator, outcome, and stop reason for every trial.</p>
-          <figure class="figure"><img src="assets/images/posters/diyrobot-06_ood_place_pill_box_old_scene.jpg" alt="DIYRobot task under altered illumination" /><figcaption>The additional 100 altered-lighting trials are OOD scenes and remain separate from the standard aggregate.</figcaption></figure>
+          <div class="section-head"><span class="section-index">10</span><div><h2>Keep evaluation fixed when using optional OOD data</h2></div></div>
+          <p>Evaluate the five prompt-v3 tasks with 50 trials each in the original environment. Record task, prompt variant, checkpoint, calibration digests, camera reference, operator, outcome, and stop reason for every trial.</p>
+          <figure class="figure"><img src="assets/images/posters/diyrobot-06_ood_place_pill_box_old_scene.jpg" alt="DIYRobot training example under altered illumination" /><figcaption>The additional 100-episode dataset contains altered-lighting demonstrations for optional training. It is not a 100-trial test set.</figcaption></figure>
+          <div class="callout success"><strong>Optional robustness setting</strong><p>Add the 100 OOD-lighting demonstrations only as a separately reported training condition. Test the resulting checkpoint with the same 50-trial-per-task protocol in the original environment so the comparison remains controlled.</p></div>
           <div class="callout"><strong>Publication boundary</strong><p>The source and protocol are released; physical execution was not rerun during this audit. Numeric equivalence still depends on checkpoints, target-specific calibration, and the pending mechanical/camera geometry release.</p></div>
         </section>
 

@@ -98,9 +98,10 @@ should include:
 Without these artifacts, physical pixel alignment is the only checkpoint-
 compatible method supported by the current code.
 
-## OOD Illumination Protocol
+## Optional OOD Illumination Data
 
-The project provides 100 additional trials under changed illumination as OOD
-scenes. Keep camera geometry, task layout, checkpoint, and success criteria
-fixed while changing only the declared lighting condition. Report these 100
-trials separately from the five-task standard-lighting result.
+The project provides an optional 100-episode training dataset collected under
+changed illumination. Keep camera geometry and task layout fixed while changing
+the declared lighting condition during collection. Evaluate the resulting
+checkpoint in the original environment with the standard 50 trials per task,
+and report this training condition separately from the 500-demonstration run.

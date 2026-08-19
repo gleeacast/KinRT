@@ -210,9 +210,10 @@ The recorder writes LeRobot v2.1 with three RGB observations, 14-D follower
 state, the 14-D target actually sent, and task text. The five canonical prompts
 are in `lower_host/diyrobot_pi05_policy_tasks_v3.sh`.
 
-The standard benchmark uses five tasks and 50 trials per task. A separate set
-of 100 trials under altered illumination is reported as OOD and must not be
-mixed into the standard-lighting aggregate.
+The standard benchmark uses five tasks and 50 trials per task in the original
+environment. An optional 100-episode training dataset was collected under
+altered illumination. Results trained with that dataset must be reported as a
+separate condition and evaluated with the same 50-trial-per-task protocol.
 
 ## Files and Provenance
 

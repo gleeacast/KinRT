@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="KinRT method, routing objective, implementation path, and FULL versus LoRA parameterization." />
     <title>Method | KinRT</title>
-    <link rel="stylesheet" href="styles.css?v=20260819-1" />
-    <script src="app.js?v=20260818-2" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260819-2" />
+    <script src="app.js?v=20260819-1" defer></script>
   </head>
   <body data-page="method">
     <a class="skip-link" href="#main">Skip to content</a>
@@ -15,7 +15,7 @@
     <div class="page docs-shell">
       <aside class="sidebar" aria-label="Documentation navigation">
         <p class="sidebar-label">Reproduce</p><nav><a href="getting-started.html" data-page-link="start">Getting started</a><a href="method.html" data-page-link="method">Method</a><a href="robotwin.html" data-page-link="robotwin">RoboTwin</a><a href="diyrobot.html" data-page-link="diyrobot">DIYRobot</a><a href="reference.html" data-page-link="reference">Reference</a></nav>
-        <div class="sidebar-divider"></div><p class="sidebar-label">On this page</p><nav><a href="#definition">Definition</a><a href="#labels">Offline labels</a><a href="#router">Router and experts</a><a href="#loss">Training objective</a><a href="#variants">FULL and LoRA</a><a href="#implementation">Code path</a><a href="#interpretation">Interpretation limits</a></nav>
+        <div class="sidebar-divider"></div><p class="sidebar-label">On this page</p><nav><a href="#definition">Definition</a><a href="#labels">Offline labels</a><a href="#router">Router and experts</a><a href="#loss">Training objective</a><a href="#variants">FULL and LoRA</a><a href="#implementation">Code path</a><a href="#evidence">RoboTwin examples</a><a href="#interpretation">Interpretation limits</a></nav>
       </aside>
       <main class="doc-main" id="main">
         <header class="doc-header">
@@ -40,6 +40,17 @@ feature = concat(flatten(chunk), flatten(velocity))
 
 # For a 14-D action: 50 * 14 + 49 * 14 = 1,386 values.</code></pre></div>
           <p>The generator fits a standard scaler, an Incremental PCA projection to 64 dimensions, and KMeans with four clusters. It writes <code>router_labels.npy</code> indexed by the dataset's global <code>index</code>, plus the sample indices, cluster model, centers, episode summary, and run metadata.</p>
+          <div class="code-block"><div class="code-toolbar"><span>Generate K=4 method labels</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>cd /path/to/KinRT/policy/pi05
+uv run python scripts/generate_router_labels.py \
+  --repo-root /data/lerobot/robotwin_800 \
+  --output-dir /data/lerobot/robotwin_800/meta/router_labels_k4 \
+  --episodes 0:800 \
+  --action-horizon 50 \
+  --feature-mode chunk_velocity \
+  --pca-components 64 \
+  --num-clusters 4 \
+  --seed 0</code></pre></div>
+          <div class="callout"><strong>K=4 belongs to KinRT, not RoboTwin.</strong><p>The benchmark supplies trajectories. KinRT defines the feature construction, PCA projection, four-cluster fit, and frame-aligned supervision. A different cluster count is a method ablation and must be reported as such.</p></div>
           <div class="table-wrap"><table><thead><tr><th>Reported RoboTwin label artifact</th><th>Value</th></tr></thead><tbody>
             <tr><td>Episodes / frames</td><td>800 / 162,545</td></tr>
             <tr><td>Raw / PCA dimensions</td><td>1,386 / 64</td></tr>
@@ -96,8 +107,19 @@ feature = concat(flatten(chunk), flatten(velocity))
           </tbody></table></div>
         </section>
 
+        <section class="section" id="evidence">
+          <div class="section-head"><span class="section-index">07</span><div><h2>Inspect KinRT across RoboTwin scene shifts</h2></div></div>
+          <p>These RoboTwin 2.0 examples show the clean and randomized scenes used to evaluate the same KinRT routing mechanism. They document benchmark conditions, not names or fixed meanings for the four kinematic clusters.</p>
+          <div class="scene-pair-grid">
+            <figure class="scene-pair"><figcaption><strong>Hand block</strong><span>RoboTwin 2.0</span></figcaption><div><img src="assets/images/posters/robotwin-01_hand_block_clean.jpg" alt="Hand block in the RoboTwin clean condition" loading="lazy" /><img src="assets/images/posters/robotwin-01_hand_block_random.jpg" alt="Hand block in the RoboTwin randomized condition" loading="lazy" /></div><p><span>Clean</span><span>Randomized</span></p></figure>
+            <figure class="scene-pair"><figcaption><strong>Open laptop</strong><span>RoboTwin 2.0</span></figcaption><div><img src="assets/images/posters/robotwin-04_open_laptop_clean.jpg" alt="Open laptop in the RoboTwin clean condition" loading="lazy" /><img src="assets/images/posters/robotwin-04_open_laptop_random.jpg" alt="Open laptop in the RoboTwin randomized condition" loading="lazy" /></div><p><span>Clean</span><span>Randomized</span></p></figure>
+            <figure class="scene-pair"><figcaption><strong>Turn switch</strong><span>RoboTwin 2.0</span></figcaption><div><img src="assets/images/posters/robotwin-08_turn_switch_clean.jpg" alt="Turn switch in the RoboTwin clean condition" loading="lazy" /><img src="assets/images/posters/robotwin-08_turn_switch_random.jpg" alt="Turn switch in the RoboTwin randomized condition" loading="lazy" /></div><p><span>Clean</span><span>Randomized</span></p></figure>
+          </div>
+          <div class="callout success"><strong>What this comparison tests</strong><p>The motion objective is unchanged while appearance and scene factors vary. Route telemetry should be interpreted together with task success and the matching checkpoint, not from a single image or cluster ID alone.</p></div>
+        </section>
+
         <section class="section" id="interpretation">
-          <div class="section-head"><span class="section-index">07</span><div><h2>Respect interpretation limits</h2></div></div>
+          <div class="section-head"><span class="section-index">08</span><div><h2>Respect interpretation limits</h2></div></div>
           <ul>
             <li>Cluster IDs are not stable semantics across independently fitted KMeans models.</li>
             <li>A dominant cluster in one task does not establish one-expert-per-task specialization.</li>

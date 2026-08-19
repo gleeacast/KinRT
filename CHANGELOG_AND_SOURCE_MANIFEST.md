@@ -2,6 +2,8 @@
 
 Audit date: 2026-08-18
 
+Website revision date: 2026-08-19
+
 This file records the source provenance, remote-write boundary, package
 consolidation, comment audit, and documentation changes made for the public
 KinRT release.
@@ -185,6 +187,31 @@ One paper/source discrepancy remains unresolved: the paper table says `Pull
 Bottle`, while the active prompt-v3 launcher describes pulling a pill box onto
 a black pad. The release documents the discrepancy instead of selecting an
 unsupported interpretation.
+
+## Website and README revision
+
+The 2026-08-19 presentation pass made the following documentation-only
+changes:
+
+- Removed the duplicated standalone `arXiv:2607.26807 [cs.RO]` line from the
+  README header while retaining the linked paper badge.
+- Replaced the sparse environment list with a platform support matrix and
+  locally stored Simple Icons for the public toolchain.
+- Corrected DIYRobot OOD wording throughout the README, website, and hardware
+  documentation. The 100-episode altered-lighting artifact is optional
+  training data; evaluation remains 50 trials per task in the original
+  environment.
+- Reduced the README parameter table to the requested two-column reference.
+- Added direct arXiv and GitHub links with recognizable icons to the project
+  homepage; the GitHub README already links back to the project page.
+- Moved the executable K=4 router-label command out of the RoboTwin and
+  DIYRobot benchmark guides and into the KinRT method page. Benchmark pages
+  now link to that method procedure.
+- Added paired RoboTwin Easy/Hard scene examples to the method page and
+  explicitly labeled them as benchmark evidence rather than cluster semantics.
+
+No policy, training, evaluation, simulator, or DIYRobot runtime source was
+changed in this presentation pass.
 
 ## Validation
 

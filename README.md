@@ -8,8 +8,6 @@
 [![GitHub](https://img.shields.io/badge/Code-GitHub-black?style=flat-square&logo=github)](https://github.com/gleeacast/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA)
 [![License](https://img.shields.io/badge/License-Apache%202.0%20%7C%20MIT-lightgrey?style=flat-square)](LICENSES/)
 
-**arXiv:2607.26807 [cs.RO]**
-
 Tianhang Yang<sup>1,2,*</sup>, Yanze Zheng<sup>1,*</sup>, Junjie Wang<sup>1</sup>, Wei-Bin Kou<sup>1,&dagger;</sup>, Ruotong Li<sup>1,2</sup>, Yujiu Yang<sup>1,&dagger;</sup>
 
 <sup>1</sup> Tsinghua Shenzhen International Graduate School, Tsinghua University<br>
@@ -70,15 +68,26 @@ The release also retains the paper-confirmed PI0, AdaMoE, and baseline configura
 
 ## Environment Setup
 
+<div align="center">
+  <img src="docs/assets/icons/linux.svg" width="34" alt="Linux" title="Linux" />&nbsp;&nbsp;
+  <img src="docs/assets/icons/ubuntu.svg" width="34" alt="Ubuntu" title="Ubuntu" />&nbsp;&nbsp;
+  <img src="docs/assets/icons/python.svg" width="34" alt="Python" title="Python" />&nbsp;&nbsp;
+  <img src="docs/assets/icons/nvidia.svg" width="38" alt="NVIDIA" title="NVIDIA CUDA" />&nbsp;&nbsp;
+  <img src="docs/assets/icons/git.svg" width="34" alt="Git" title="Git and Git LFS" />&nbsp;&nbsp;
+  <img src="docs/assets/icons/uv.svg" width="34" alt="uv" title="uv" />
+</div>
+
 ### Requirements
 
-- Linux
-- Python 3.11 or newer
-- CUDA 12-compatible NVIDIA driver
-- Git and Git LFS
-- [`uv`](https://docs.astral.sh/uv/)
-- A compatible RoboTwin 2.0 checkout for simulation evaluation
-- PI0.5 or PI0 base parameters and a LeRobot-format dataset for training
+| System | KinRT training | RoboTwin GPU simulation | DIYRobot deployment |
+| --- | :---: | :---: | :---: |
+| Ubuntu 22.04 / NVIDIA GPU | Supported path | Supported path | Supported path |
+| Other Linux / NVIDIA GPU | Compatibility-dependent | Follow upstream RoboTwin support | Hardware-dependent |
+| Windows / NVIDIA GPU | Not documented | Not documented | Not supported |
+| WSL2 / NVIDIA GPU | Not validated | Not validated | Do not use for hardware control |
+| macOS / Apple silicon | Not supported | Not supported | Not supported |
+
+The supported release path requires Python 3.11 or newer, a CUDA 12-compatible NVIDIA driver, Git with Git LFS, FFmpeg, and [`uv`](https://docs.astral.sh/uv/). RoboTwin evaluation additionally requires a compatible RoboTwin 2.0 checkout. Training requires matching PI0.5 or PI0 base parameters and a LeRobot-format dataset.
 
 Full-parameter training requires substantially more GPU memory than LoRA. The reported experiments use an effective batch size of 32; adjust device allocation and gradient accumulation together when reproducing that setting.
 
@@ -155,32 +164,32 @@ Use a separate result directory for every model, checkpoint, task, and condition
 
 ### Parameter Reference
 
-| Parameter | Reported setting | Purpose |
-| --- | ---: | --- |
-| Action horizon | 50 | Predict one 50-step action chunk |
-| Kinematic features | Action + velocity | Capture spatial configuration and motion tempo |
-| PCA components | 64 | Compress trajectory features before clustering |
-| Routed experts | 4 | Match the four discovered kinematic archetypes |
-| Routing | Global Top-1 | Select one routed expert per action chunk |
-| Router loss coefficient | 0.05 | Supervise routing without replacing the action objective |
-| Balanced-sampling coefficient | 0.5 | Increase minority-archetype exposure |
-| Effective batch size | 32 | Paper training setting |
-| RoboTwin training steps | 10,000 | Paper simulation setting |
-| DIYRobot training steps | 8,000 | Retained physical-platform run setting |
+| Parameter | Reported setting |
+| --- | ---: |
+| Action horizon | 50 |
+| Kinematic features | Action + velocity |
+| PCA components | 64 |
+| Routed experts | 4 |
+| Routing | Global Top-1 |
+| Router loss coefficient | 0.05 |
+| Balanced-sampling coefficient | 0.5 |
+| Effective batch size | 32 |
+| RoboTwin training steps | 10,000 |
+| DIYRobot training steps | 8,000 |
 
 ### Supported Benchmarks
 
 | Benchmark | Tasks | Training demonstrations | Evaluation protocol | Release support |
 | --- | ---: | ---: | --- | --- |
 | RoboTwin 2.0 | 8 | 800 total | 100 Clean + 100 Random trials per task | Policy and evaluation overlay |
-| DIYRobot | 5 | 500 total | 50 standard trials per task + 100 OOD trials | Configs, conversion, serving, and hardware guide |
+| DIYRobot | 5 | 500 total | 50 trials per task in the original environment | Configs, conversion, serving, and hardware guide |
 
 The full RoboTwin simulator, datasets, base checkpoints, fine-tuned checkpoints,
 and physical apparatus are external. The reviewed DIYRobot lower-host source and
 operator documentation are included under `hardware/diyrobot/`; mechanical CAD
 and dimensions remain pending.
 
-> **OOD evaluation.** In addition to the standard DIYRobot protocol, we provide 100 evaluation trials under altered illumination. These lighting-shift trials represent OOD scenes and should be reported separately from the standard-lighting results.
+> **Optional OOD training data.** We additionally provide a 100-episode dataset collected under different illumination. It may be added to the training set as an optional robustness setting. Evaluation remains 50 trials per task in the original environment, and results using the optional dataset should be reported separately from the standard 500-demonstration setting.
 
 ### Sampling Configurations
 
