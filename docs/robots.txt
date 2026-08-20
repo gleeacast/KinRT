@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://gleeacast.github.io/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA/sitemap.xml
+Sitemap: https://gleeacast.github.io/KinRT/sitemap.xml

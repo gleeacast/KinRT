@@ -3,9 +3,9 @@
 <div align="center">
 
 [![Paper](https://img.shields.io/badge/Paper-arXiv%3A2607.26807-b31b1b?style=flat-square&logo=arxiv)](https://arxiv.org/abs/2607.26807)
-[![Project Page](https://img.shields.io/badge/Project-Page-green?style=flat-square&logo=github)](https://gleeacast.github.io/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA/)
+[![Project Page](https://img.shields.io/badge/Project-Page-green?style=flat-square&logo=github)](https://gleeacast.github.io/KinRT/)
 [![Models](https://img.shields.io/badge/Models-HuggingFace-orange?style=flat-square&logo=huggingface)](#)
-[![GitHub](https://img.shields.io/badge/Code-GitHub-black?style=flat-square&logo=github)](https://github.com/gleeacast/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA)
+[![GitHub](https://img.shields.io/badge/Code-GitHub-black?style=flat-square&logo=github)](https://github.com/gleeacast/KinRT)
 [![License](https://img.shields.io/badge/License-Apache%202.0%20%7C%20MIT-lightgrey?style=flat-square)](LICENSES/)
 
 Tianhang Yang<sup>1,2,*</sup>, Yanze Zheng<sup>1,*</sup>, Junjie Wang<sup>1</sup>, Wei-Bin Kou<sup>1,&dagger;</sup>, Ruotong Li<sup>1,2</sup>, Yujiu Yang<sup>1,&dagger;</sup>
@@ -85,7 +85,7 @@ Full-parameter training requires substantially more GPU memory than LoRA. The re
 ### Installation
 
 ```bash
-git clone https://github.com/gleeacast/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA.git KinRT
+git clone https://github.com/gleeacast/KinRT.git
 cd KinRT/policy/pi05
 
 git lfs install
@@ -194,11 +194,11 @@ and dimensions remain pending.
 
 | Topic | Document |
 | --- | --- |
-| End-to-end starting point | [Getting started](https://gleeacast.github.io/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA/getting-started.html) |
+| End-to-end starting point | [Getting started](https://gleeacast.github.io/KinRT/getting-started.html) |
 | KinRT design and implementation | [Implementation reference](docs/KINRT_IMPLEMENTATION.md) |
-| DIYRobot hardware, data, and evaluation | [DIYRobot guide](https://gleeacast.github.io/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA/diyrobot.html) |
+| DIYRobot hardware, data, and evaluation | [DIYRobot guide](https://gleeacast.github.io/KinRT/diyrobot.html) |
 | DIYRobot lower-host source | [Hardware release](hardware/diyrobot/README.md) |
-| RoboTwin training and evaluation | [RoboTwin guide](https://gleeacast.github.io/Route-by-Kinematics-Act-by-Observation-Kinematics-Supervised-Expert-Routing-in-MoE-Augmented-VLA/robotwin.html) |
+| RoboTwin training and evaluation | [RoboTwin guide](https://gleeacast.github.io/KinRT/robotwin.html) |
 | FULL and LoRA differences | [Parameterization comparison](docs/FULL_VS_LORA.md) |
 | Source provenance and release changes | [Change and source manifest](CHANGELOG_AND_SOURCE_MANIFEST.md) |
 
@@ -225,7 +225,7 @@ If you use KinRT, please cite:
 
 ## Acknowledgements
 
-We thank Xiaoteng Liu for his engineering contributions to the KinRT project.
+We sincerely thank Xiaoteng Liu for his engineering contributions to building the 3D-printable DIYRobot platform and its hardware drivers.
 
 ## License
 
