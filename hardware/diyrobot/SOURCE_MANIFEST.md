@@ -3,6 +3,9 @@
 Initial read-only audit: 2026-08-18
 
 Dependency confirmation: 2026-08-19
+
+Mechanical parameter publication: 2026-08-25
+
 Remote scope: `~/lerobot/src/lerobot/robots/hi_arm`
 
 ## Remote-Write Statement
@@ -23,6 +26,15 @@ calibration, teleoperation, or policy process was started.
 | Collection | `diyrobot_pi05_record.py`, `start_diyrobot_pi05_record.sh`, `start_diyrobot_pi05_record_manual.sh` | LeRobot v2.1 automatic and manual episodes |
 | Policy deployment | `diyrobot_pi05_policy_client.py`, `start_diyrobot_pi05_policy_client.sh`, `diyrobot_pi05_policy_tasks_v3.sh` | Observation construction, policy transport, guarded action execution |
 | Camera preview | `remote_camera_webui.py`, `diyrobot_three_camera_webui.py`, `start_diyrobot_three_camera_webui.sh` | Three-view inspection and overhead reference overlay |
+
+## Included Public Hardware Records
+
+| Record | Purpose |
+| --- | --- |
+| `PARAMETERS.md` | Source-verified arm, base, lift, camera, control, and safety parameter register |
+| `BOM.csv` | Core electromechanical BOM with explicit verified, partial, and pending states |
+| `mechanics/README.md` | Arm/base provenance boundary, private CAD audit, and final CAD acceptance checklist |
+| `THIRD_PARTY_NOTICES.md` | TRLC-DK1 attribution, Apache-2.0 obligations, and vendor redistribution boundary |
 
 `hiarm_four_pose_calibrate.py` was fetched after the initial directory copy
 because `hiarm_joint_mapping_calibrate.py` imports it. Its presence on the
@@ -71,8 +83,10 @@ copy differs from the source-host snapshot only in these release concerns:
   and device-topology values from the source host.
 - Older local manuals containing Chinese text, stale port maps, or internal
   machine details.
-- Mechanical dimensions, CAD, wiring drawings, and task-mat geometry that have
-  not yet been approved for public release.
+- The unverified v0.2.0-derived NX working directory, its stale STEP export,
+  generated `577xxx` import duplicates, and path-bearing NX log.
+- Mechanical dimensions, chassis/lift CAD, wiring drawings, and task-mat
+  geometry that are absent or have not yet been approved for public release.
 
 ## Known Source Boundaries
 
@@ -84,6 +98,10 @@ copy differs from the source-host snapshot only in these release concerns:
   preprocessing; current reproduction requires physical pixel alignment.
 - Model checkpoints, LeRobot source revision, and mechanical release artifacts
   remain external.
+- The follower-arm mechanism is a TRLC-DK1-derived design adapted for RobStride
+  O3. The mobile chassis and lift integration are original DIYRobot designs.
+  This provenance split applies to mechanics and does not override third-party
+  software or purchased-hardware licenses.
 
 ## Hashes
 

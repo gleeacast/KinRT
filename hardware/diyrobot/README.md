@@ -19,15 +19,18 @@ Included now:
   and camera-preview source.
 - Verified electrical addressing, control units, camera roles, and safety
   thresholds.
+- A public parameter register, core electromechanical BOM, mechanical
+  provenance boundary, and third-party notices.
 - Device-mapping, zeroing, camera-alignment, collection, and deployment
   procedures.
 - Original-snapshot and public-release SHA-256 manifests.
 
 Pending a later hardware release:
 
-- CAD and mechanical drawings.
-- Arm-link, frame, work-mat, and camera-mount dimensions.
-- Wiring drawings and manufacturer part numbers for custom parts.
+- Verified RobStride-adapted arm CAD, printable parts, and mechanical drawings.
+- Original chassis and lift CAD, manufacturing drawings, and complete dimensions.
+- Arm-link, frame, work-mat, camera-mount, and wiring dimensions.
+- Manufacturer part numbers not already present in the core BOM.
 - A printable task-mat reference and camera-intrinsic calibration.
 - Transferable checkpoints and robot-specific calibration files.
 
@@ -73,6 +76,34 @@ hardware-active tools.
 
 The measured values above are software parameters from the active source, not
 a complete mechanical specification.
+
+## Mechanical Design and Attribution
+
+DIYRobot combines a derived arm mechanism with an original mobile platform:
+
+| Assembly | Public provenance | Current release state |
+| --- | --- | --- |
+| Follower arm | Derived from the Apache-2.0-licensed [TRLC-DK1 Follower](https://github.com/robot-learning-co/trlc-dk1) v0.2.0 working design and adapted for RobStride O3 actuators | Source-verified actuator contract and modification inventory released; final CAD validation pending |
+| Three-wheel mobile base | Original DIYRobot mechanical design | Kinematics, addressing, control parameters, and safety limits released; approved CAD and complete manufacturing dimensions pending |
+| Lift integration | Original DIYRobot system integration | Motor, limit sensing, homing, and base/lift interlocks released; travel, load rating, and mechanical drawings pending |
+
+The current TRLC-DK1 repository publishes v0.3.0. It is a useful upstream
+reference but is not asserted to be geometrically identical to the local
+v0.2.0-derived DIYRobot assembly. The internal NX workspace also contains a
+pre-adaptation STEP and generated import duplicates, so it is not uploaded as a
+finished hardware release.
+
+Released hardware references:
+
+- [Public parameter register](PARAMETERS.md)
+- [Core electromechanical BOM](BOM.csv)
+- [Mechanical release and CAD audit](mechanics/README.md)
+- [Third-party notices](THIRD_PARTY_NOTICES.md)
+
+All released derivative CAD must preserve TRLC-DK1 attribution and carry a
+prominent modification notice. The chassis originality statement applies only
+to the DIYRobot mechanical chassis and lift integration; purchased hardware and
+third-party software retain their respective ownership and licenses.
 
 ## Control Topology
 
@@ -229,6 +260,10 @@ use `RELEASE_SOURCE_SHA256.txt` to verify this sanitized public copy.
 
 ## Further Reading
 
+- [Public parameter register](PARAMETERS.md)
+- [Core electromechanical BOM](BOM.csv)
+- [Mechanical release and CAD audit](mechanics/README.md)
+- [Third-party notices](THIRD_PARTY_NOTICES.md)
 - [Calibration and zeroing](CALIBRATION.md)
 - [Camera and workspace alignment](CAMERA_ALIGNMENT.md)
 - [Source and release manifest](SOURCE_MANIFEST.md)

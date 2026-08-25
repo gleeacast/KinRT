@@ -11,12 +11,12 @@
   <body data-page="diyrobot">
     <a class="skip-link" href="#main">Skip to content</a>
     <header class="site-header"><div class="header-inner"><a class="brand" href="index.html"><span class="brand-mark">Kin</span>KinRT</a><button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="primary-nav">Menu</button><nav class="primary-nav" id="primary-nav" data-primary-nav aria-label="Primary navigation"><a href="getting-started.html" data-page-link="start">Start</a><a href="method.html" data-page-link="method">Method</a><a href="diyrobot.html" data-page-link="diyrobot">DIYRobot</a><a href="robotwin.html" data-page-link="robotwin">RoboTwin</a><a href="reference.html" data-page-link="reference">Reference</a></nav></div></header>
-    <div class="release-strip"><div class="release-strip-inner"><span><span class="status-dot"></span><strong>Source</strong> lower host released</span><span><strong>Control/data</strong> 20 FPS</span><span><strong>Evaluation</strong> 5 x 50</span><span><strong>Optional data</strong> +100 OOD demos</span><span><span class="status-dot external"></span><strong>CAD</strong> pending</span></div></div>
+    <div class="release-strip"><div class="release-strip-inner"><span><span class="status-dot"></span><strong>Source</strong> lower host released</span><span><strong>Control/data</strong> 20 FPS</span><span><strong>Evaluation</strong> 5 x 50</span><span><strong>Optional data</strong> +100 OOD demos</span><span><span class="status-dot external"></span><strong>Mechanics</strong> parameters released; CAD review pending</span></div></div>
 
     <div class="page docs-shell">
       <aside class="sidebar" aria-label="Documentation navigation">
         <p class="sidebar-label">Reproduce</p><nav><a href="getting-started.html" data-page-link="start">Getting started</a><a href="method.html" data-page-link="method">Method</a><a href="diyrobot.html" data-page-link="diyrobot">DIYRobot</a><a href="robotwin.html" data-page-link="robotwin">RoboTwin</a><a href="reference.html" data-page-link="reference">Reference</a></nav>
-        <div class="sidebar-divider"></div><p class="sidebar-label">On this page</p><nav><a href="#status">Release status</a><a href="#hardware">Hardware</a><a href="#install">Install</a><a href="#devices">Devices</a><a href="#calibration">Calibration</a><a href="#cameras">Cameras</a><a href="#collect">Collect</a><a href="#train">Train</a><a href="#deploy">Deploy</a><a href="#report">Report</a></nav>
+        <div class="sidebar-divider"></div><p class="sidebar-label">On this page</p><nav><a href="#status">Release status</a><a href="#mechanics">Design provenance</a><a href="#hardware">Parameters</a><a href="#install">Install</a><a href="#devices">Devices</a><a href="#calibration">Calibration</a><a href="#cameras">Cameras</a><a href="#collect">Collect</a><a href="#train">Train</a><a href="#deploy">Deploy</a><a href="#report">Report</a></nav>
       </aside>
 
       <main class="doc-main" id="main">
@@ -28,14 +28,24 @@
 
         <section class="section" id="status">
           <div class="section-head"><span class="section-index">01</span><div><h2>Know what is reproducible today</h2></div></div>
-          <p>The public release now includes the reviewed lower-host implementation under <code>hardware/diyrobot/lower_host</code>, source hashes, calibration procedures, and camera-reference data. The source host was read only: no remote file or hardware state was changed during this audit.</p>
-          <div class="callout warning"><strong>Coming soon: complete hardware and camera installation specifications.</strong><p>Detailed arm dimensions, CAD, link and frame dimensions, per-camera mounting position and orientation, wiring drawings, task-mat dimensions, and a printable reference mat will be released in the next update. Do not derive them from photographs or claim a mechanically identical reproduction before those artifacts are available.</p></div>
+          <p>The public release now includes the reviewed lower-host implementation under <code>hardware/diyrobot/lower_host</code>, source hashes, calibration procedures, camera-reference data, a parameter register, a core BOM, and explicit mechanical provenance. The source host was read only: no remote file or hardware state was changed during this audit.</p>
+          <div class="callout warning"><strong>Parameters are public; final manufacturing CAD remains under review.</strong><p>The release identifies every source-verified actuator, address, control parameter, camera role, base dimension, and safety threshold. The verified RobStride-adapted arm CAD, original chassis and lift drawings, complete fastener BOM, camera-mount geometry, and printable task mat will follow after assembly and redistribution checks. Do not claim a mechanically identical reconstruction before those artifacts are available.</p></div>
           <p>DIYRobot is the only public platform and runtime name. The earlier internal name appears only in immutable source-provenance and historical-checkpoint records; it does not identify a second robot or a public code path.</p>
           <p><a href="https://github.com/gleeacast/KinRT/tree/main/hardware/diyrobot">Open the DIYRobot source and full operator documentation</a>.</p>
         </section>
 
+        <section class="section" id="mechanics">
+          <div class="section-head"><span class="section-index">02</span><div><h2>Separate the derived arm from the original base</h2></div></div>
+          <div class="checklist">
+            <div class="check-item"><strong>Follower arm · Derived design</strong><p>The follower-arm mechanism is derived from the Apache-2.0-licensed <a href="https://github.com/robot-learning-co/trlc-dk1">TRLC-DK1 Follower</a> v0.2.0 working design and adapted for RobStride O3 actuators. Modified adapter, shaft, bearing, link, cable-cover, and mount parts require final assembly verification before CAD release.</p></div>
+            <div class="check-item"><strong>Mobile base and lift · Original DIYRobot design</strong><p>The three-omni-wheel chassis and lift-system mechanical integration are original DIYRobot engineering. This claim does not extend to purchased actuators, cameras, vendor interfaces, or third-party software.</p></div>
+          </div>
+          <p>The current TRLC-DK1 repository publishes v0.3.0; it is an upstream reference, not the exact geometry of the local v0.2.0-derived assembly. Apache-2.0 attribution and modification notices will accompany every released derivative CAD file.</p>
+          <div class="callout"><strong>Open hardware records</strong><p>Read the <a href="https://github.com/gleeacast/KinRT/blob/main/hardware/diyrobot/PARAMETERS.md">complete parameter register</a>, <a href="https://github.com/gleeacast/KinRT/blob/main/hardware/diyrobot/BOM.csv">core BOM</a>, <a href="https://github.com/gleeacast/KinRT/tree/main/hardware/diyrobot/mechanics">mechanical release audit</a>, and <a href="https://github.com/gleeacast/KinRT/blob/main/hardware/diyrobot/THIRD_PARTY_NOTICES.md">third-party notices</a>.</p></div>
+        </section>
+
         <section class="section" id="hardware">
-          <div class="section-head"><span class="section-index">02</span><div><h2>Assemble the verified electrical topology</h2></div></div>
+          <div class="section-head"><span class="section-index">03</span><div><h2>Assemble from verified parameters</h2></div></div>
           <figure class="figure"><img src="assets/images/hardware-stack.png" alt="DIYRobot hardware and control topology" /><figcaption>The lower host owns cameras and actuator buses; the GPU host owns KinRT inference.</figcaption></figure>
           <div class="table-wrap"><table><thead><tr><th>Subsystem</th><th>Verified hardware</th><th>Addressing</th></tr></thead><tbody>
             <tr><td>Leader arms</td><td>14 Feetech STS3215</td><td>Left 1-7; right 8-14</td></tr>
@@ -47,7 +57,9 @@
           <div class="table-wrap"><table><thead><tr><th>Parameter</th><th>Released value</th><th>Scope</th></tr></thead><tbody>
             <tr><td>Wheel radius</td><td><code>0.05 m</code></td><td>Software kinematics</td></tr>
             <tr><td>Base radius</td><td><code>0.125 m</code></td><td>Center-to-wheel</td></tr>
+            <tr><td>Wheel layout</td><td><code>240 / 0 / 120 deg</code></td><td>Left / back / right azimuth in the released kinematic model</td></tr>
             <tr><td>Wheel speed cap</td><td><code>100 RPM</code></td><td>Command safety cap</td></tr>
+            <tr><td>Base control</td><td><code>kp=0</code>, <code>kd=3</code>, feed-forward <code>3</code></td><td>Classic CAN at 1 Mbit/s</td></tr>
             <tr><td>Lift homing</td><td><code>-1</code>, step <code>2 deg</code>, <code>kp=8</code>, <code>kd=0.3</code></td><td>Automatic homing disabled by default</td></tr>
             <tr><td>Lift thresholds</td><td><code>30 / 90 deg</code></td><td>Base/lift coordination</td></tr>
             <tr><td>Fast base threshold</td><td><code>0.2 m/s</code></td><td>Blocks upward lift target</td></tr>
@@ -56,7 +68,7 @@
         </section>
 
         <section class="section" id="install">
-          <div class="section-head"><span class="section-index">03</span><div><h2>Install the lower-host package</h2></div></div>
+          <div class="section-head"><span class="section-index">04</span><div><h2>Install the lower-host package</h2></div></div>
           <p>Use the LeRobot revision validated for the platform. The release does not claim compatibility with every upstream revision.</p>
           <div class="code-block"><div class="code-toolbar"><span>Lower-host installation</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>cd /path/to/lerobot
 python3 -m venv .venv
@@ -75,7 +87,7 @@ python -c "from lerobot.robots.diyrobot import DIYRobot; print(DIYRobot.name)"</
         </section>
 
         <section class="section" id="devices">
-          <div class="section-head"><span class="section-index">04</span><div><h2>Map devices by identity</h2></div></div>
+          <div class="section-head"><span class="section-index">05</span><div><h2>Map devices by identity</h2></div></div>
           <p>The release omits the original serial numbers and USB topology. Create target-specific udev rules that map verified devices to these semantic paths:</p>
           <div class="table-wrap"><table><thead><tr><th>Path</th><th>Physical role</th></tr></thead><tbody>
             <tr><td><code>/dev/diyrobot/leader</code></td><td>Feetech leader bus</td></tr>
@@ -94,7 +106,7 @@ udevadm info --query=property --name=/dev/video0</code></pre></div>
         </section>
 
         <section class="section" id="calibration">
-          <div class="section-head"><span class="section-index">05</span><div><h2>Calibrate and zero one joint at a time</h2></div></div>
+          <div class="section-head"><span class="section-index">06</span><div><h2>Calibrate and zero one joint at a time</h2></div></div>
           <p>Generate all calibration files on the target robot. The tools do not issue pose targets, but follower sampling may briefly enable and disable the selected RobStride motor.</p>
           <div class="code-block"><div class="code-toolbar"><span>One-side rest and range</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>cd /path/to/lerobot/src/lerobot/robots/diyrobot
 
@@ -116,7 +128,7 @@ python diyrobot_rest_range_calibrate.py show &#92;
         </section>
 
         <section class="section" id="cameras">
-          <div class="section-head"><span class="section-index">06</span><div><h2>Align all three cameras to the checkpoint contract</h2></div></div>
+          <div class="section-head"><span class="section-index">07</span><div><h2>Align all three cameras to the checkpoint contract</h2></div></div>
           <div class="table-wrap"><table><thead><tr><th>View</th><th>Collection key</th><th>Policy key</th><th>Format</th></tr></thead><tbody>
             <tr><td>Overhead</td><td><code>overhead</code></td><td><code>cam_high</code></td><td>640 x 480 @ 30</td></tr>
             <tr><td>Left wrist</td><td><code>left_gripper</code></td><td><code>cam_left_wrist</code></td><td>640 x 480 @ 30</td></tr>
@@ -130,7 +142,7 @@ python diyrobot_rest_range_calibrate.py show &#92;
         </section>
 
         <section class="section" id="collect">
-          <div class="section-head"><span class="section-index">07</span><div><h2>Collect and inspect a smoke episode</h2></div></div>
+          <div class="section-head"><span class="section-index">08</span><div><h2>Collect and inspect a smoke episode</h2></div></div>
           <div class="code-block"><div class="code-toolbar"><span>One bounded episode</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>TASK="Put the pill box into the center of the notebook." &#92;
 REPO_ID="local/diyrobot_smoke" ROOT="/data/diyrobot/smoke" &#92;
 EPISODES=1 EPISODE_TIME=20 RESET_TIME=0 FPS=20 &#92;
@@ -145,7 +157,7 @@ EPISODES=1 EPISODE_TIME=20 RESET_TIME=0 FPS=20 &#92;
         </section>
 
         <section class="section" id="train">
-          <div class="section-head"><span class="section-index">08</span><div><h2>Prepare method labels and train</h2></div></div>
+          <div class="section-head"><span class="section-index">09</span><div><h2>Prepare method labels and train</h2></div></div>
           <p>Freeze the dataset digest, then create and verify K=4 supervision using the <a href="method.html#labels">KinRT method procedure</a> with the DIYRobot dataset path. FULL and LoRA are optimization regimes of the same method.</p>
           <div class="code-block"><div class="code-toolbar"><span>Normalization and training</span><button class="copy-button" type="button" data-copy>Copy</button></div><pre><code>cd /path/to/KinRT/policy/pi05
 uv run python scripts/compute_norm_stats.py &#92;
@@ -156,7 +168,7 @@ uv run python scripts/train.py kinrt_full_diyrobot &#92;
         </section>
 
         <section class="section" id="deploy">
-          <div class="section-head"><span class="section-index">09</span><div><h2>Deploy through guarded stages</h2></div></div>
+          <div class="section-head"><span class="section-index">10</span><div><h2>Deploy through guarded stages</h2></div></div>
           <div class="flow">
             <div class="flow-step"><span>GATE A</span><strong>Offline self-test</strong><p>No cameras or actuator buses.</p></div>
             <div class="flow-step"><span>GATE B</span><strong>Dry policy</strong><p>Cameras and feedback, no target commands.</p></div>
@@ -173,7 +185,7 @@ ALLOW_MOTION=1 DURATION=30 ACTION_CHUNK_STEPS=1 &#92;
         </section>
 
         <section class="section" id="report">
-          <div class="section-head"><span class="section-index">10</span><div><h2>Keep evaluation fixed when using optional OOD data</h2></div></div>
+          <div class="section-head"><span class="section-index">11</span><div><h2>Keep evaluation fixed when using optional OOD data</h2></div></div>
           <p>Evaluate the five prompt-v3 tasks with 50 trials each in the original environment. Record task, prompt variant, checkpoint, calibration digests, camera reference, operator, outcome, and stop reason for every trial.</p>
           <figure class="figure"><img src="assets/images/posters/diyrobot-06_ood_place_pill_box_old_scene.jpg" alt="DIYRobot training example under altered illumination" /><figcaption>The additional 100-episode dataset contains altered-lighting demonstrations for optional training. It is not a 100-trial test set.</figcaption></figure>
           <div class="callout success"><strong>Optional robustness setting</strong><p>Add the 100 OOD-lighting demonstrations only as a separately reported training condition. Test the resulting checkpoint with the same 50-trial-per-task protocol in the original environment so the comparison remains controlled.</p></div>

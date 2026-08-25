@@ -4,6 +4,8 @@ Audit date: 2026-08-18
 
 Website revision date: 2026-08-19
 
+DIYRobot mechanical parameter revision date: 2026-08-25
+
 This file records the source provenance, remote-write boundary, package
 consolidation, comment audit, and documentation changes made for the public
 KinRT release.
@@ -212,6 +214,35 @@ changes:
 
 No policy, training, evaluation, simulator, or DIYRobot runtime source was
 changed in this presentation pass.
+
+## DIYRobot mechanical parameter release
+
+The 2026-08-25 hardware documentation pass audited the local NX working
+directory and the public TRLC-DK1 repository. It did not modify the NX files or
+operate any physical hardware.
+
+- The follower-arm mechanism is now explicitly described as a derivative of
+  the Apache-2.0-licensed TRLC-DK1 Follower v0.2.0 working design, adapted for
+  RobStride O3 actuators.
+- The three-omni-wheel chassis and lift-system mechanical integration are
+  explicitly described as original DIYRobot engineering. This statement is
+  limited to those mechanical contributions.
+- `hardware/diyrobot/PARAMETERS.md` publishes the source-verified arm order and
+  IDs, policy guards, base kinematics, wheel and lift control, camera mapping,
+  and evaluation contract with evidence levels.
+- `hardware/diyrobot/BOM.csv` publishes the verified core electromechanical BOM
+  and marks unknown supplier or manufacturing fields as partial or pending.
+- `hardware/diyrobot/mechanics/README.md` records why the old STEP and
+  NX-generated duplicates are not a final public CAD package and defines the
+  release acceptance checklist.
+- `hardware/diyrobot/THIRD_PARTY_NOTICES.md` records upstream attribution,
+  Apache-2.0 redistribution requirements, and the vendor-CAD boundary.
+- `docs/diyrobot.html` and `hardware/diyrobot/README.md` now expose the same
+  provenance and parameter boundary.
+
+The audited STEP predates later NX part modifications and still identifies
+Damiao arm components. No approved chassis CAD was found. Those files were not
+uploaded or represented as mechanically reproducible artifacts.
 
 ## Validation
 
