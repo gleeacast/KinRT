@@ -174,6 +174,7 @@ Use a separate result directory for every model, checkpoint, task, and condition
 | --- | ---: | ---: | --- | --- |
 | DIYRobot | 5 | 500 total | 50 trials per task in the original environment | Configs, conversion, serving, and hardware guide |
 | RoboTwin 2.0 | 8 | 800 total | 100 Clean + 100 Random trials per task | Policy and evaluation overlay |
+| RoboDojo | Task-selectable | Requires upstream demonstrations | Three evaluation seeds plus hidden-layout verification | Experimental XPolicyLab adapter |
 
 The full RoboTwin simulator, datasets, base checkpoints, fine-tuned checkpoints,
 and physical apparatus are external. The reviewed DIYRobot lower-host source and
@@ -199,6 +200,7 @@ and dimensions remain pending.
 | DIYRobot hardware, data, and evaluation | [DIYRobot guide](https://gleeacast.github.io/KinRT/diyrobot.html) |
 | DIYRobot lower-host source | [Hardware release](hardware/diyrobot/README.md) |
 | RoboTwin training and evaluation | [RoboTwin guide](https://gleeacast.github.io/KinRT/robotwin.html) |
+| RoboDojo adaptation | [RoboDojo guide](docs/ROBODOJO.md) |
 | FULL and LoRA differences | [Parameterization comparison](docs/FULL_VS_LORA.md) |
 | Source provenance and release changes | [Change and source manifest](CHANGELOG_AND_SOURCE_MANIFEST.md) |
 

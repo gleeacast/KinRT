@@ -5,6 +5,7 @@ from collections.abc import Sequence
 import dataclasses
 import difflib
 import logging
+import os
 import pathlib
 from typing import Any, Literal, Protocol, TypeAlias
 
@@ -505,6 +506,8 @@ class TrainConfig:
     assets_base_dir: str = "./assets"
     # Base directory for checkpoints.
     checkpoint_base_dir: str = "./checkpoints"
+    # Optional exact run directory used by external evaluation frameworks.
+    checkpoint_dir_override: str | None = None
 
     # Random seed that will be used by random generators during training.
     seed: int = 42
@@ -554,6 +557,8 @@ class TrainConfig:
         """Get the checkpoint directory for this config."""
         if not self.exp_name:
             raise ValueError("--exp_name must be set")
+        if self.checkpoint_dir_override:
+            return pathlib.Path(self.checkpoint_dir_override).resolve()
         return (pathlib.Path(self.checkpoint_base_dir) / self.name / self.exp_name).resolve()
 
     @property
@@ -564,6 +569,85 @@ class TrainConfig:
     def __post_init__(self) -> None:
         if self.resume and self.overwrite:
             raise ValueError("Cannot resume and overwrite at the same time.")
+
+
+_KINRT_ROBODOJO_REPO_ID = os.environ.get(
+    "KINRT_ROBODOJO_REPO_ID",
+    "RoboDojo-KinRT-arx_x5-joint",
+)
+_KINRT_ROBODOJO_CACHE_ROOT = pathlib.Path(
+    os.environ.get(
+        "HF_LEROBOT_HOME",
+        pathlib.Path(os.environ.get("HF_HOME", pathlib.Path.home() / ".cache" / "huggingface")) / "lerobot",
+    )
+).expanduser()
+_KINRT_ROBODOJO_ROUTER_LABELS_PATH = os.environ.get(
+    "KINRT_ROBODOJO_ROUTER_LABELS_PATH",
+    str(_KINRT_ROBODOJO_CACHE_ROOT / _KINRT_ROBODOJO_REPO_ID / "meta" / "router_labels_k4" / "router_labels.npy"),
+)
+_KINRT_PI05_BASE_PARAMS = os.environ.get(
+    "OPENPI_BASE_CHECKPOINT",
+    "gs://openpi-assets/checkpoints/pi05_base/params",
+)
+
+
+def _kinrt_robodojo_data_config() -> LeRobotAlohaDataConfig:
+    """Build the shared 14-D joint-control data pipeline for RoboDojo KinRT runs."""
+    return LeRobotAlohaDataConfig(
+        repo_id=_KINRT_ROBODOJO_REPO_ID,
+        adapt_to_pi=False,
+        repack_transforms=_transforms.Group(
+            inputs=[
+                _transforms.RepackTransform(
+                    {
+                        "images": {
+                            "cam_high": "observation.images.cam_high",
+                            "cam_left_wrist": "observation.images.cam_left_wrist",
+                            "cam_right_wrist": "observation.images.cam_right_wrist",
+                        },
+                        "state": "observation.state",
+                        "actions": "action",
+                        "prompt": "prompt",
+                    }
+                )
+            ]
+        ),
+        base_config=DataConfig(
+            prompt_from_task=True,
+            router_labels_path=_KINRT_ROBODOJO_ROUTER_LABELS_PATH,
+            router_balanced_sampling=True,
+            router_sampling_alpha=0.5,
+            # Retained for checkpoint/config compatibility; the current
+            # balanced sampler consumes alpha but not mix_beta.
+            router_sampling_mix_beta=0.6,
+            router_class_weights=(1.0, 1.0, 1.0, 1.0),
+        ),
+    )
+
+
+def _pi05_robodojo_data_config() -> LeRobotAlohaDataConfig:
+    """Build the matched RoboDojo pipeline without routing supervision."""
+    return LeRobotAlohaDataConfig(
+        repo_id=_KINRT_ROBODOJO_REPO_ID,
+        adapt_to_pi=False,
+        repack_transforms=_transforms.Group(
+            inputs=[
+                _transforms.RepackTransform(
+                    {
+                        "images": {
+                            "cam_high": "observation.images.cam_high",
+                            "cam_left_wrist": "observation.images.cam_left_wrist",
+                            "cam_right_wrist": "observation.images.cam_right_wrist",
+                        },
+                        "state": "observation.state",
+                        "actions": "action",
+                        "prompt": "prompt",
+                    }
+                )
+            ]
+        ),
+        base_config=DataConfig(prompt_from_task=True),
+    )
 
 
 # Use `get_config` if you need to get a config by name in your code.
@@ -581,7 +665,6 @@ _CONFIGS = [
             action_expert_router_supervised_loss_coef=0.05,
             action_expert_router_aux_loss_coef=0.0,
             action_expert_router_entropy_loss_coef=0.0,
-            action_expert_router_action_grad_coef=0.0,
             action_expert_routing_contrastive_loss_coef=0.0,
             action_expert_dead_expert_loss_coef=0.0,
             action_expert_router_action_loss_weight_coef=0.0,
@@ -626,7 +709,6 @@ _CONFIGS = [
             action_expert_router_supervised_loss_coef=0.05,
             action_expert_router_aux_loss_coef=0.0,
             action_expert_router_entropy_loss_coef=0.0,
-            action_expert_router_action_grad_coef=0.0,
             action_expert_routing_contrastive_loss_coef=0.0,
             action_expert_dead_expert_loss_coef=0.0,
             action_expert_router_action_loss_weight_coef=0.0,
@@ -926,6 +1008,101 @@ _CONFIGS = [
         save_interval=1000,
         checkpoint_base_dir="/var/ckpt",
         wandb_enabled=False,
+    ),
+
+    # Plain pi0.5-LoRA baseline matched to the RoboDojo KinRT run. It uses the
+    # same observations, actions, optimizer budget, and LoRA ranks, but no MoE,
+    # router labels, or routing-aware sampling.
+    TrainConfig(
+        name="pi05_lora_robodojo",
+        model=pi0_config.Pi0Config(
+            pi05=True,
+            paligemma_variant="gemma_2b_lora",
+            action_expert_variant="gemma_300m_lora",
+            paligemma_lora_rank=32,
+            action_expert_lora_rank=64,
+            action_horizon=50,
+            action_expert_num_moe_experts=0,
+        ),
+        data=_pi05_robodojo_data_config(),
+        freeze_filter=pi0_config.Pi0Config(
+            pi05=True,
+            paligemma_variant="gemma_2b_lora",
+            action_expert_variant="gemma_300m_lora",
+        ).get_freeze_filter(),
+        weight_loader=weight_loaders.CheckpointWeightLoader(_KINRT_PI05_BASE_PARAMS),
+        ema_decay=None,
+        num_train_steps=60_000,
+        batch_size=32,
+        num_workers=8,
+        fsdp_devices=4,
+        save_interval=5_000,
+        keep_period=10_000,
+    ),
+
+    # Both configurations below implement KinRT. LoRA changes only the
+    # parameter update regime; routing, supervision, and data remain identical.
+    TrainConfig(
+        name="kinrt_lora_robodojo",
+        model=pi0_config.Pi0Config(
+            pi05=True,
+            paligemma_variant="gemma_2b_lora",
+            action_expert_variant="gemma_300m_lora",
+            paligemma_lora_rank=32,
+            action_expert_lora_rank=64,
+            action_horizon=50,
+            action_expert_num_moe_experts=4,
+            action_expert_num_experts_per_tok=1,
+            action_expert_router_aux_loss_coef=0.0,
+            action_expert_router_entropy_loss_coef=0.0,
+            action_expert_router_input="pooled",
+            action_expert_router_type="dense",
+            action_expert_routing_contrastive_loss_coef=0.0,
+            action_expert_dead_expert_loss_coef=0.0,
+            action_expert_router_supervised_loss_coef=0.05,
+            action_expert_router_action_loss_weight_coef=0.0,
+        ),
+        data=_kinrt_robodojo_data_config(),
+        freeze_filter=pi0_config.Pi0Config(
+            pi05=True,
+            paligemma_variant="gemma_2b_lora",
+            action_expert_variant="gemma_300m_lora",
+        ).get_freeze_filter(),
+        weight_loader=weight_loaders.CheckpointWeightLoader(_KINRT_PI05_BASE_PARAMS),
+        ema_decay=None,
+        num_train_steps=60_000,
+        batch_size=32,
+        num_workers=8,
+        fsdp_devices=4,
+        save_interval=5_000,
+        keep_period=10_000,
+    ),
+
+    TrainConfig(
+        name="kinrt_full_robodojo",
+        model=pi0_config.Pi0Config(
+            pi05=True,
+            action_horizon=50,
+            action_expert_num_moe_experts=4,
+            action_expert_num_experts_per_tok=1,
+            action_expert_router_aux_loss_coef=0.0,
+            action_expert_router_entropy_loss_coef=0.0,
+            action_expert_router_input="pooled",
+            action_expert_router_type="dense",
+            action_expert_routing_contrastive_loss_coef=0.0,
+            action_expert_dead_expert_loss_coef=0.0,
+            action_expert_router_supervised_loss_coef=0.05,
+            action_expert_router_action_loss_weight_coef=0.0,
+        ),
+        data=_kinrt_robodojo_data_config(),
+        weight_loader=weight_loaders.CheckpointWeightLoader(_KINRT_PI05_BASE_PARAMS),
+        ema_decay=None,
+        num_train_steps=60_000,
+        batch_size=32,
+        num_workers=8,
+        fsdp_devices=4,
+        save_interval=5_000,
+        keep_period=10_000,
     ),
 
     # KinRT supervision applied to AdaMoE with four experts on DIYRobot.
